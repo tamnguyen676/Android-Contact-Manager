@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,8 +8,11 @@
     android:layout_height="match_parent"
     android:gravity="top|center"
     android:orientation="vertical"
+    android:background="#222327"
     tools:context="com.example.contactmanager.MainActivity">
 
+    <include layout="@layout/tool_bar"
+        android:id="@+id/customToolBar"/>
     <TabHost
         android:id="@+id/tabHost"
         android:layout_width="fill_parent"
@@ -36,7 +41,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/textView"
+                        android:id="@+id/tab1Header"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -54,90 +59,38 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/tabCreator"
+                    android:id="@+id/tabGroupList"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:orientation="vertical">
 
+
                     <TextView
-                        android:id="@+id/lblCreatorTitle"
+                        android:id="@+id/tab2Header"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
                         android:gravity="center"
-                        android:text="Contact Creator"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <EditText
-                        android:id="@+id/txtName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="15dp"
-                        android:ems="10"
-                        android:hint="Contact Name"
-                        android:inputType="textPersonName"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title"
-                        android:textSize="18sp" />
-
-                    <EditText
-                        android:id="@+id/txtPhone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="15dp"
-                        android:ems="10"
-                        android:hint="Phone Number"
-                        android:inputType="phone"
-                        android:phoneNumber="true"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title"
-                        android:textSize="18sp" />
-
-                    <EditText
-                        android:id="@+id/txtEmail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="15dp"
-                        android:ems="10"
-                        android:hint="Email"
-                        android:inputType="textEmailAddress"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title"
-                        android:textSize="18sp" />
-
-                    <EditText
-                        android:id="@+id/txtAddress"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="15dp"
-                        android:ems="10"
-                        android:hint="Address"
-                        android:inputType="textPostalAddress"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title"
-                        android:textSize="18sp" />
-
-                    <Button
-                        android:id="@+id/btnAdd"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:enabled="false"
-                        android:text="Add Contact"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Menu" />
-
+                        android:text="Groups"
+                        android:textSize="20sp" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/tab3"
+                    android:id="@+id/tabBlockedList"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
+                    <TextView
+                        android:id="@+id/tab3Header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:text="Blocked"
+                        android:textSize="20sp" />
                 </LinearLayout>
             </FrameLayout>
         </LinearLayout>

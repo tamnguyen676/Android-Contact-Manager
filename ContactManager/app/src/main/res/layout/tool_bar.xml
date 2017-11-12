@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/colorPrimary"
+    android:minHeight="?attr/actionBarSize"
+    android:theme="?attr/actionBarTheme"
+    >
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/toolBarTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contact Manager"
+        android:textColor="@android:color/background_light"
+        android:textSize="24sp" />
+        android:
+
+    <Button
+        android:id="@+id/btnAdd"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:layout_width="33dp"
+        android:layout_height="33dp"
+        android:layout_gravity="end"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/ic_action_name"
+        android:scaleType="fitCenter" />
+    </android.support.v7.widget.Toolbar>
