@@ -29,12 +29,31 @@ public class ContactListAdapter extends ArrayAdapter<Contact> {
 
         TextView name = (TextView) theView.findViewById(R.id.contactName);
         name.setText(currentContact.getName());
-        TextView phone = (TextView) theView.findViewById(R.id.phoneNumber);
-        phone.setText(currentContact.getPhone());
-        TextView address = (TextView) theView.findViewById(R.id.cAddress);
-        address.setText(currentContact.getAddress());
-        TextView email = (TextView) theView.findViewById(R.id.emailAddress);
-        email.setText(currentContact.getEmail());
+
+            TextView phone = (TextView) theView.findViewById(R.id.phoneNumber);
+            phone.setText(currentContact.getPhone());
+
+
+            TextView address = (TextView) theView.findViewById(R.id.cAddress);
+            address.setText(currentContact.getAddress());
+
+
+            TextView email = (TextView) theView.findViewById(R.id.emailAddress);
+            email.setText(currentContact.getEmail());
+
+
+            TextView group = (TextView) theView.findViewById(R.id.Group);
+            group.setText(currentContact.getGroup());
+
+        if(currentContact.getPhone().equals(""))
+            phone.setVisibility(View.GONE);
+        if(currentContact.getAddress().equals(""))
+            address.setVisibility(View.GONE);
+        if(currentContact.getEmail().equals(""))
+            email.setVisibility(View.GONE);
+        if(currentContact.getGroup().equals(""))
+            group.setVisibility(View.GONE);
+
 
         return theView;
     }

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="top"
+    android:gravity="top"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/contactName"
@@ -17,8 +20,11 @@
         android:id="@+id/phoneNumber"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="top"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
+        android:elevation="0dp"
+        android:gravity="top"
         android:text="Phone"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
         android:textSize="14sp" />
@@ -27,8 +33,10 @@
         android:id="@+id/emailAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="top"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
+        android:gravity="top"
         android:text="Email"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
         android:textSize="14sp" />
@@ -37,9 +45,23 @@
         android:id="@+id/cAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="top"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
+        android:gravity="top"
         android:text="Address"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/Group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:gravity="top"
+        android:text="Group"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
         android:textSize="14sp" />
 </LinearLayout>

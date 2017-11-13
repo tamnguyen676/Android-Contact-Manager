@@ -18,7 +18,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     static List<Contact> Contacts = new ArrayList<Contact>();
+    static List<Group> Groups = new ArrayList<Group>();
     ListView contactListView ;
+    ListView groupListView ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         contactListView = (ListView) findViewById(R.id.listView);
+        groupListView = (ListView) findViewById(R.id.grouplistView);
 
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
@@ -69,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void populateList() {
         ArrayAdapter<Contact> adapter = new ContactListAdapter(this, Contacts);
+        ArrayAdapter<Group> adapter1 = new GroupListAdapter(this, Groups);
         contactListView.setAdapter(adapter);
+        groupListView.setAdapter(adapter1);
     }
 }

@@ -6,13 +6,22 @@ package com.example.contactmanager;
 
 public class Contact {
 
-    private String _name, _phone, _email, _address;
+    private String _name, _phone, _email, _address, _group;
 
     public Contact(String name, String phone, String email, String address) {
         _name = name;
         _phone = phone;
         _email = email;
         _address = address;
+        _group = "";
+
+    }
+    public Contact(String name, String phone, String email, String address, String group) {
+        _name = name;
+        _phone = phone;
+        _email = email;
+        _address = address;
+        _group = group;
 
     }
 
@@ -30,4 +39,5 @@ public class Contact {
     public String getAddress(){
         return _address;
     }
+    public String getGroup() { return _group; }
 }
