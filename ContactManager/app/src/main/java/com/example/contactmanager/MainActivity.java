@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TabHost;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -59,14 +61,15 @@ public class MainActivity extends AppCompatActivity {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent createContactIntent = new Intent(MainActivity.this, CreateContact.class );
-                startActivityForResult(createContactIntent, 1);
+            Intent createContactIntent = new Intent(MainActivity.this, CreateContact.class );
+            startActivityForResult(createContactIntent, 1);
             }
         });
     }
 
     //after returning from activity update list view
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Collections.sort(Contacts); //Sorts contacts in alphabetical order
         populateList();
     }
 

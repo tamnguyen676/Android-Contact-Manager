@@ -1,10 +1,12 @@
 package com.example.contactmanager;
 
+import android.support.annotation.NonNull;
+
 /**
  * Created by Artem on 10/21/17.
  */
 
-public class Contact {
+public class Contact implements Comparable<Contact>{
 
     private String _name, _phone, _email, _address, _group;
 
@@ -22,7 +24,12 @@ public class Contact {
         _email = email;
         _address = address;
         _group = group;
+    }
 
+    //Allows for sorting based on name of contact
+    @Override
+    public int compareTo(Contact contact) {
+        return _name.compareTo(contact.getName());
     }
 
     public String getName(){
