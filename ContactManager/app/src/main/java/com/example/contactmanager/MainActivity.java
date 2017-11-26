@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TabHost;
+import android.widget.Toast;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -21,14 +22,14 @@ import java.util.List;
 
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ContactRecyclerAdapter.ListItemClickListener{
 
     static ArrayList<Contact> Contacts = new ArrayList<Contact>();
     static ArrayList<Group> Groups = new ArrayList<Group>();
-    //ListView contactListView ;
-    RecyclerView contactRecyclerView;
+    RecyclerView contactRecyclerView;   //Reference object to the RecyclerView
     private ContactRecyclerAdapter contactAdapter;
     ListView groupListView ;
+    private Toast toast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -36,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //contactListView = (ListView) findViewById(R.id.listView);
         contactRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         groupListView = (ListView) findViewById(R.id.grouplistView);
 
@@ -61,16 +61,14 @@ public class MainActivity extends AppCompatActivity {
         tabSpec.setIndicator("Blocked");
         tabHost.addTab(tabSpec);
 
-
-        final Button btnAdd = (Button) findViewById(R.id.btnAdd);
-
         //Gets RecyclerView ready for contact list
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         contactRecyclerView.setLayoutManager(layoutManager);
-        contactAdapter = new ContactRecyclerAdapter(0);
+        contactAdapter = new ContactRecyclerAdapter(0,this);
         contactRecyclerView.setAdapter(contactAdapter);
 
+        final Button btnAdd = (Button) findViewById(R.id.btnAdd);
         //if add was clicked, then start new activity
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,7 +82,18 @@ public class MainActivity extends AppCompatActivity {
     //after returning from activity update list view
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Collections.sort(Contacts); //Sorts contacts in alphabetical order
-        contactAdapter.updateList(Contacts);
+        contactAdapter.updateList(Contacts);    //Sends the updated list to the Adapter
+    }
+
+    @Override
+    public void onListItemClick(int positionClicked){
+        if (toast != null){
+            toast.cancel();
+        }
+
+        String clickedMessage = "Item #" + positionClicked + " clicked.";
+        toast = Toast.makeText(this, clickedMessage, Toast.LENGTH_LONG);
+        toast.show();
     }
 
 }

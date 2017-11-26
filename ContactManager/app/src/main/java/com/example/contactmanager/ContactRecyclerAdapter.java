@@ -11,19 +11,32 @@ import java.util.ArrayList;
 
 public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecyclerAdapter.ContactViewHolder>{
     private int mNumItems;
+    private ListItemClickListener onClickListener;
     private ArrayList<Contact> contactList;
 
-    public ContactRecyclerAdapter(int numItems){
+    public ContactRecyclerAdapter(int numItems, ListItemClickListener listener){
         mNumItems = numItems;
+        onClickListener = listener;
     }
 
-    public class ContactViewHolder extends RecyclerView.ViewHolder {
+    public interface ListItemClickListener{
+        void onListItemClick(int positionClicked);
+    }
+
+    public class ContactViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public final TextView contactNameTextView;
 
         public ContactViewHolder(View itemView) {
             super(itemView);
 
             contactNameTextView = (TextView) itemView.findViewById(R.id.contactName);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view){
+            int positionClicked = getAdapterPosition();
+            onClickListener.onListItemClick(positionClicked);
         }
     }
 
