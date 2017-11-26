@@ -4,11 +4,15 @@ package com.example.contactmanager;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TabHost;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -19,9 +23,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    static List<Contact> Contacts = new ArrayList<Contact>();
-    static List<Group> Groups = new ArrayList<Group>();
-    ListView contactListView ;
+    static ArrayList<Contact> Contacts = new ArrayList<Contact>();
+    static ArrayList<Group> Groups = new ArrayList<Group>();
+    //ListView contactListView ;
+    RecyclerView contactRecyclerView;
+    private ContactRecyclerAdapter contactAdapter;
     ListView groupListView ;
 
     @Override
@@ -30,7 +36,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        contactListView = (ListView) findViewById(R.id.listView);
+        //contactListView = (ListView) findViewById(R.id.listView);
+        contactRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         groupListView = (ListView) findViewById(R.id.grouplistView);
 
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
@@ -57,6 +64,13 @@ public class MainActivity extends AppCompatActivity {
 
         final Button btnAdd = (Button) findViewById(R.id.btnAdd);
 
+        //Gets RecyclerView ready for contact list
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        contactRecyclerView.setLayoutManager(layoutManager);
+        contactAdapter = new ContactRecyclerAdapter(0);
+        contactRecyclerView.setAdapter(contactAdapter);
+
         //if add was clicked, then start new activity
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,13 +84,7 @@ public class MainActivity extends AppCompatActivity {
     //after returning from activity update list view
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Collections.sort(Contacts); //Sorts contacts in alphabetical order
-        populateList();
+        contactAdapter.updateList(Contacts);
     }
 
-    private void populateList() {
-        ArrayAdapter<Contact> adapter = new ContactListAdapter(this, Contacts);
-        ArrayAdapter<Group> adapter1 = new GroupListAdapter(this, Groups);
-        contactListView.setAdapter(adapter);
-        groupListView.setAdapter(adapter1);
-    }
 }
