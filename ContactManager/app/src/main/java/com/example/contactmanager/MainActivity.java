@@ -96,4 +96,10 @@ public class MainActivity extends AppCompatActivity implements ContactRecyclerAd
         toast.show();
     }
 
+    public void viewContact(int contact){
+        Intent viewContactIntent = new Intent(MainActivity.this, ViewContact.class);
+        viewContactIntent.putExtra("CONTACT", Contacts.get(contact));
+        startActivity(viewContactIntent);
+    }
+
 }
