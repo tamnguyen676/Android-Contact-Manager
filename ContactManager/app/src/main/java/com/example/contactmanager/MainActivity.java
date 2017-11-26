@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         contactRecyclerView.setLayoutManager(layoutManager);
-        contactAdapter = new ContactRecyclerAdapter(0);
+        contactAdapter = new ContactRecyclerAdapter(0, this, contactRecyclerView);
         contactRecyclerView.setAdapter(contactAdapter);
 
         //if add was clicked, then start new activity
@@ -85,6 +85,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Collections.sort(Contacts); //Sorts contacts in alphabetical order
         contactAdapter.updateList(Contacts);
+    }
+
+    public void viewContact(int contact){
+        Intent viewContactIntent = new Intent(MainActivity.this, ViewContact.class);
+        viewContactIntent.putExtra("CONTACT", Contacts.get(contact));
+        startActivity(viewContactIntent);
     }
 
 }

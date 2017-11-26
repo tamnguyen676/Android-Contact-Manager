@@ -20,6 +20,16 @@ public class ViewContact extends AppCompatActivity {
         emailTxt = (TextView) findViewById(R.id.txtEmail);
         addressTxt = (TextView) findViewById(R.id.txtAddress);
         groupTxt = (TextView) findViewById(R.id.txtGroup);
+
+        Bundle extras = this.getIntent().getExtras();
+        if(extras != null){
+            Contact contact = (Contact)extras.getSerializable("CONTACT");
+            nameTxt.setText(contact.getName());
+            phoneTxt.setText(contact.getPhone());
+            emailTxt.setText(contact.getEmail());
+            addressTxt.setText(contact.getAddress());
+            groupTxt.setText(contact.getGroup());
+        }
     }
 
 }

@@ -2,11 +2,13 @@ package com.example.contactmanager;
 
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
+
 /**
  * Created by Artem on 10/21/17.
  */
 
-public class Contact implements Comparable<Contact>{
+public class Contact implements Comparable<Contact>, Serializable{
 
     private String _name, _phone, _email, _address, _group;
 

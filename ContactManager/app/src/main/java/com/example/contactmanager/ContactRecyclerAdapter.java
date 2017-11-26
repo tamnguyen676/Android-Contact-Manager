@@ -6,15 +6,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.view.View.OnClickListener;
 
 import java.util.ArrayList;
 
 public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecyclerAdapter.ContactViewHolder>{
     private int mNumItems;
     private ArrayList<Contact> contactList;
+    MainActivity mainActivity;
+    RecyclerView recyclerView;
 
-    public ContactRecyclerAdapter(int numItems){
+    public ContactRecyclerAdapter(int numItems, MainActivity mainActivity, RecyclerView recyclerView){
         mNumItems = numItems;
+        this.mainActivity = mainActivity;
+        this.recyclerView = recyclerView;
     }
 
     public class ContactViewHolder extends RecyclerView.ViewHolder {
@@ -25,6 +30,7 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
 
             contactNameTextView = (TextView) itemView.findViewById(R.id.contactName);
         }
+
     }
 
     @Override
@@ -37,15 +43,23 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         View view = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
         ContactViewHolder viewHolder = new ContactViewHolder(view);
 
+
+
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ContactViewHolder holder, int position) {
+    public void onBindViewHolder(ContactViewHolder holder, final int position) {
         Contact contact = contactList.get(position);
         String contactInfo = contact.getName();
 
         holder.contactNameTextView.setText(contactInfo);
+        holder.contactNameTextView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                mainActivity.viewContact(position);
+            }
+        });
     }
 
     @Override
