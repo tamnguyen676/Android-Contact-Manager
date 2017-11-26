@@ -6,11 +6,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Array;
@@ -22,14 +24,15 @@ import java.util.List;
 
 
 
-public class MainActivity extends AppCompatActivity implements ContactRecyclerAdapter.ListItemClickListener{
+public class MainActivity extends AppCompatActivity {
 
     static ArrayList<Contact> Contacts = new ArrayList<Contact>();
     static ArrayList<Group> Groups = new ArrayList<Group>();
     RecyclerView contactRecyclerView;   //Reference object to the RecyclerView
     private ContactRecyclerAdapter contactAdapter;
     ListView groupListView ;
-    private Toast toast;
+
+    private TextView label1, label2, label3, label4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -81,20 +84,11 @@ public class MainActivity extends AppCompatActivity implements ContactRecyclerAd
 
     //after returning from activity update list view
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //Todo Fix bug that causes sort do display "Name"  before "abc" due to uppercase letters
         Collections.sort(Contacts); //Sorts contacts in alphabetical order
         contactAdapter.updateList(Contacts);    //Sends the updated list to the Adapter
     }
 
-    @Override
-    public void onListItemClick(int positionClicked){
-        if (toast != null){
-            toast.cancel();
-        }
-
-        String clickedMessage = "Item #" + positionClicked + " clicked.";
-        toast = Toast.makeText(this, clickedMessage, Toast.LENGTH_LONG);
-        toast.show();
-    }
 
     public void viewContact(int contact){
         Intent viewContactIntent = new Intent(MainActivity.this, ViewContact.class);

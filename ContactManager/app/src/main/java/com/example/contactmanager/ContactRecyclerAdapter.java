@@ -12,37 +12,23 @@ import java.util.ArrayList;
 
 public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecyclerAdapter.ContactViewHolder>{
     private int mNumItems;
-    private ListItemClickListener onClickListener;
     private ArrayList<Contact> contactList;
     MainActivity mainActivity;
 
 
     public ContactRecyclerAdapter(int numItems, MainActivity mainActivity){
         mNumItems = numItems;
-        onClickListener = mainActivity;
         this.mainActivity = mainActivity;
     }
 
-    public interface ListItemClickListener{
-        void onListItemClick(int positionClicked);
-    }
-
-    public class ContactViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ContactViewHolder extends RecyclerView.ViewHolder{
         public final TextView contactNameTextView;
 
         public ContactViewHolder(View itemView) {
             super(itemView);
 
             contactNameTextView = (TextView) itemView.findViewById(R.id.contactName);
-            itemView.setOnClickListener(this);
         }
-
-        @Override
-        public void onClick(View view){
-            int positionClicked = getAdapterPosition();
-            onClickListener.onListItemClick(positionClicked);
-        }
-
     }
 
     @Override

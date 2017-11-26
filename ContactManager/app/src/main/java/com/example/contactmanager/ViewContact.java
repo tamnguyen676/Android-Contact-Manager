@@ -2,12 +2,15 @@ package com.example.contactmanager;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.TextView;
 
 
 public class ViewContact extends AppCompatActivity {
 
-    TextView nameTxt, phoneTxt, emailTxt, addressTxt, groupTxt;
+    TextView nameTxt, label1, label2, label3, label4, field1, field2, field3, field4;
+    String phone, email, address, group;
+    int numberOfLabelsNeeded = 0;
 
     @Override
     public void onCreate(Bundle SavedInstanceState){
@@ -16,20 +19,84 @@ public class ViewContact extends AppCompatActivity {
         setContentView((R.layout.activity_view_contact));
 
         nameTxt = (TextView) findViewById(R.id.txtName);
-        phoneTxt = (TextView) findViewById(R.id.txtPhone);
-        emailTxt = (TextView) findViewById(R.id.txtEmail);
-        addressTxt = (TextView) findViewById(R.id.txtAddress);
-        groupTxt = (TextView) findViewById(R.id.txtGroup);
+        label1 = (TextView) findViewById(R.id.label1);
+        label2 = (TextView) findViewById(R.id.label2);
+        label3 = (TextView) findViewById(R.id.label3);
+        label4 = (TextView) findViewById(R.id.label4);
+        field1 = (TextView) findViewById(R.id.field1);
+        field2 = (TextView) findViewById(R.id.field2);
+        field3 = (TextView) findViewById(R.id.field3);
+        field4 = (TextView) findViewById(R.id.field4);
+
 
         Bundle extras = this.getIntent().getExtras();
-        if(extras != null){
+        if (extras != null){
             Contact contact = (Contact)extras.getSerializable("CONTACT");
             nameTxt.setText(contact.getName());
-            phoneTxt.setText(contact.getPhone());
-            emailTxt.setText(contact.getEmail());
-            addressTxt.setText(contact.getAddress());
-            groupTxt.setText(contact.getGroup());
+
+            phone = contact.getPhone();
+            email = contact.getEmail();
+            address = contact.getAddress();
+            group = contact.getGroup();
+
+            if (phone.compareTo("") != 0){
+                numberOfLabelsNeeded++;
+                setText("Phone",phone);
+            }
+
+            if (email.compareTo("") != 0){
+                numberOfLabelsNeeded++;
+                setText("Email",email);
+            }
+
+            if (address.compareTo("") != 0){
+                numberOfLabelsNeeded++;
+                setText("Address",address);
+            }
+
+            if (group.compareTo("") != 0){
+                numberOfLabelsNeeded++;
+                setText("Group",group);
+            }
+
+            hideExtraLabels();
+
         }
     }
 
+    public void setText(String label,String info){
+        getLabel(numberOfLabelsNeeded).setText(label);
+        getField(numberOfLabelsNeeded).setText(info);
+    }
+
+    public TextView getLabel(int labelNum){
+        switch (labelNum){
+            case 1: return label1;
+            case 2: return label2;
+            case 3: return label3;
+            case 4: return label4;
+        }
+
+        return null;
+    }
+
+    public TextView getField(int fieldNum){
+        switch (fieldNum){
+            case 1: return field1;
+            case 2: return field2;
+            case 3: return field3;
+            case 4: return field4;
+        }
+
+        return null;
+    }
+
+    public void hideExtraLabels(){  //NOTE: This relies on the fall through of the switch statement
+        switch (numberOfLabelsNeeded){
+            case 0: label1.setText("");
+            case 1: label2.setText("");
+            case 2: label3.setText("");
+            case 3: label4.setText("");
+        }
+    }
 }
