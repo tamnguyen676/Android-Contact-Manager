@@ -10,7 +10,7 @@ public class ViewContact extends AppCompatActivity {
 
     TextView nameTxt, label1, label2, label3, label4, field1, field2, field3, field4;
     String phone, email, address, group;
-    int numberOfLabelsNeeded = 0;
+    int numberOfLabelsNeeded = 0;   //This keeps track of how many labels we need.
 
     @Override
     public void onCreate(Bundle SavedInstanceState){
@@ -39,11 +39,13 @@ public class ViewContact extends AppCompatActivity {
             address = contact.getAddress();
             group = contact.getGroup();
 
+            //If not empty, then set the next available label to say "Phone" and display phone number beneath
             if (phone.compareTo("") != 0){
-                numberOfLabelsNeeded++;
+                numberOfLabelsNeeded++; //Updates counter to know how many labels have been used
                 setText("Phone",phone);
             }
 
+            //Same as above, but with email
             if (email.compareTo("") != 0){
                 numberOfLabelsNeeded++;
                 setText("Email",email);
@@ -59,17 +61,18 @@ public class ViewContact extends AppCompatActivity {
                 setText("Group",group);
             }
 
-            hideExtraLabels();
+            hideExtraLabels();  //Makes the labels we don't use invisible.
 
         }
     }
 
-    public void setText(String label,String info){
+    private void setText(String label,String info){
         getLabel(numberOfLabelsNeeded).setText(label);
         getField(numberOfLabelsNeeded).setText(info);
     }
 
-    public TextView getLabel(int labelNum){
+    //Returns the next available label based on how many have been used
+    private TextView getLabel(int labelNum){
         switch (labelNum){
             case 1: return label1;
             case 2: return label2;
@@ -80,7 +83,8 @@ public class ViewContact extends AppCompatActivity {
         return null;
     }
 
-    public TextView getField(int fieldNum){
+    //Returns the next available field depending on how many have been used
+    private TextView getField(int fieldNum){
         switch (fieldNum){
             case 1: return field1;
             case 2: return field2;
@@ -91,7 +95,8 @@ public class ViewContact extends AppCompatActivity {
         return null;
     }
 
-    public void hideExtraLabels(){  //NOTE: This relies on the fall through of the switch statement
+    //Hides extra labels that are not used
+    private void hideExtraLabels(){  //NOTE: This relies on the fall through of the switch statement
         switch (numberOfLabelsNeeded){
             case 0: label1.setText("");
             case 1: label2.setText("");
