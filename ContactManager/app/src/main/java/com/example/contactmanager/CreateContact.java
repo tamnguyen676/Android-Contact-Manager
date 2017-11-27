@@ -14,6 +14,7 @@ import android.widget.Toast;
 public class CreateContact extends AppCompatActivity {
 
     EditText nameTxt, phoneTxt, emailTxt, addressTxt, groupTxt;
+    Bundle oldData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,13 +28,28 @@ public class CreateContact extends AppCompatActivity {
         addressTxt = (EditText) findViewById(R.id.txtAddress);
         groupTxt = (EditText) findViewById(R.id.txtGroup);
 
-        final Button btnCreateContact = (Button) findViewById(R.id.btnCreateContact);
+        oldData = this.getIntent().getExtras();
 
-        btnCreateContact.setOnClickListener(new View.OnClickListener() {
+        final Button btnSaveContact = (Button) findViewById(R.id.btnSaveContact);
+
+        if(oldData != null){
+            Contact currentContact = (Contact)oldData.getSerializable("CONTACT");
+            nameTxt.setText(currentContact.getName());
+            phoneTxt.setText(currentContact.getPhone());
+            emailTxt.setText(currentContact.getEmail());
+            addressTxt.setText(currentContact.getAddress());
+            groupTxt.setText(currentContact.getGroup());
+
+            btnSaveContact.setEnabled(true);
+        }
+
+
+
+        btnSaveContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                addContact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString(),groupTxt.getText().toString());
+                Contact newContact = new Contact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString(),groupTxt.getText().toString());
+                updateContact(oldData, newContact);
                 finish();
                 Toast.makeText(getApplicationContext(), nameTxt.getText().toString()+" has been added to your Contacts!", Toast.LENGTH_SHORT).show();
             }
@@ -46,7 +62,7 @@ public class CreateContact extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                btnCreateContact.setEnabled(!nameTxt.getText().toString().trim().isEmpty());
+                btnSaveContact.setEnabled(!nameTxt.getText().toString().trim().isEmpty());
             }
 
             @Override
@@ -58,33 +74,49 @@ public class CreateContact extends AppCompatActivity {
 
     }
 
-    private void addContact(String name, String phone, String email, String address, String group) {
+    private void addContact(Contact newContact) {
 
-        if(!group.equals(""))  //if grouptxt field has a String
+        MainActivity.Contacts.add(newContact); //Create the contact
+
+        if(!newContact.getGroup().equals(""))  //if grouptxt field has a String
         {
-            Contact temp = new Contact(name, phone, email, address, group);
-            MainActivity.Contacts.add(temp); //add contact to contact list w group field
-            if(existingGroup(group) == -1) // if group doesn't already exist
+            if(existingGroup(newContact.getGroup()) == -1) // if group doesn't already exist
             {
 
-                MainActivity.Groups.add(new Group(group,temp)); //adds contact to the group
+                MainActivity.Groups.add(new Group(newContact.getGroup(),newContact)); //adds contact to the group
                 System.out.println("Created a new group");
             }
             else {
                 System.out.println("Trying to add to existing group");
-                MainActivity.Groups.get(existingGroup(group)).addContact(temp); // if group already exists adds contact to the group
+                MainActivity.Groups.get(existingGroup(newContact.getGroup())).addContact(newContact); // if group already exists adds contact to the group
             }
         }
-        else
-            MainActivity.Contacts.add(new Contact(name, phone, email, address)); // groupfield was left blank so just adds to contactlist
 
+    }
+
+    private void updateContact(Bundle oldData, Contact newContact){
+        System.out.println("Updating");
+        if(oldData != null){ //If there is an old version of the contact, delete it first
+            System.out.println("Deleting");
+            Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
+            MainActivity.Contacts.remove(oldContact);
+            if(oldContact.getGroup() != ""){ //If they belonged to a group, remove them from it
+                Group oldGroup = MainActivity.Groups.get(existingGroup(oldContact.getGroup()));
+                oldGroup.removeContact(oldContact);
+                if(oldGroup.size == 0){ //The the group is empty now, delete it
+                    MainActivity.Groups.remove(oldGroup);
+                }
+            }
+
+        }
+        addContact(newContact); //Add the new contact
     }
 
     public int existingGroup(String a)  //Checks List of groups to see that group has been created
     {
         int x = 0;
 
-            while (x < MainActivity.Groups.size()-1) {
+            while (x < MainActivity.Groups.size()) {
                 if (a.equals(MainActivity.Groups.get(x).getGroupName()))
                     return x;
                 x++;

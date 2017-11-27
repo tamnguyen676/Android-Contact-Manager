@@ -117,13 +117,13 @@
         app:layout_constraintTop_toBottomOf="@+id/txtAddress" />
 
     <Button
-        android:id="@+id/btnCreateContact"
+        android:id="@+id/btnSaveContact"
         android:layout_width="368dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:enabled="false"
-        android:text="Add Contact"
+        android:text="Save Contact"
         android:textAppearance="@style/TextAppearance.AppCompat.Menu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

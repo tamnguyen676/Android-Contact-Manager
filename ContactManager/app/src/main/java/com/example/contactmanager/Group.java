@@ -28,6 +28,12 @@ public class Group {
     public void addContact(Contact a) {
         Contacts.add(new Contact(a.getName(), a.getPhone(), a.getEmail(), a.getAddress(), a.getGroup()));
         size++;
+    }
 
+    public void removeContact(Contact toRemove){
+        if(Contacts.contains(toRemove)){
+            Contacts.remove(toRemove);
+            size--;
+        }
     }
 }

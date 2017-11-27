@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ((ContactManagerApplication)getApplication()).mainActivity = this;
 
         contactRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         groupListView = (ListView) findViewById(R.id.grouplistView);
@@ -85,8 +86,7 @@ public class MainActivity extends AppCompatActivity {
     //after returning from activity update list view
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //Todo Fix bug that causes sort do display "Name"  before "abc" due to uppercase letters
-        Collections.sort(Contacts); //Sorts contacts in alphabetical order
-        contactAdapter.updateList(Contacts);    //Sends the updated list to the Adapter
+        updateContacts();
     }
 
 
@@ -94,6 +94,11 @@ public class MainActivity extends AppCompatActivity {
         Intent viewContactIntent = new Intent(MainActivity.this, ViewContact.class);
         viewContactIntent.putExtra("CONTACT", Contacts.get(contact));
         startActivity(viewContactIntent);
+    }
+
+    public void updateContacts(){
+        Collections.sort(Contacts); //Sorts contacts in alphabetical order
+        contactAdapter.updateList(Contacts);
     }
 
 }

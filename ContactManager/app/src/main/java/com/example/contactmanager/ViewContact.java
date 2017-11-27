@@ -1,16 +1,21 @@
 package com.example.contactmanager;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.EditText;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 
 public class ViewContact extends AppCompatActivity {
 
+
     TextView nameTxt, label1, label2, label3, label4, field1, field2, field3, field4;
     String phone, email, address, group;
     int numberOfLabelsNeeded = 0;   //This keeps track of how many labels we need.
+    Contact contact;
+
 
     @Override
     public void onCreate(Bundle SavedInstanceState){
@@ -29,15 +34,19 @@ public class ViewContact extends AppCompatActivity {
         field4 = (TextView) findViewById(R.id.field4);
 
 
-        Bundle extras = this.getIntent().getExtras();
-        if (extras != null){
-            Contact contact = (Contact)extras.getSerializable("CONTACT");
-            nameTxt.setText(contact.getName());
+        final Button buttonEdit = (Button) findViewById(R.id.btnEdit);
 
+        Bundle extras = this.getIntent().getExtras();
+
+        if (extras != null){
+            contact = (Contact)extras.getSerializable("CONTACT");
+            nameTxt.setText(contact.getName());
             phone = contact.getPhone();
             email = contact.getEmail();
             address = contact.getAddress();
             group = contact.getGroup();
+
+
 
             //If not empty, then set the next available label to say "Phone" and display phone number beneath
             if (phone.compareTo("") != 0){
@@ -63,7 +72,17 @@ public class ViewContact extends AppCompatActivity {
 
             hideExtraLabels();  //Makes the labels we don't use invisible.
 
+            buttonEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent editContactIntent = new Intent(ViewContact.this, CreateContact.class );
+                    editContactIntent.putExtra("CONTACT", contact);
+                    startActivityForResult(editContactIntent, 1);
+                }
+            });
         }
+        else
+            this.finish();
     }
 
     private void setText(String label,String info){
@@ -79,7 +98,6 @@ public class ViewContact extends AppCompatActivity {
             case 3: return label3;
             case 4: return label4;
         }
-
         return null;
     }
 
@@ -96,12 +114,20 @@ public class ViewContact extends AppCompatActivity {
     }
 
     //Hides extra labels that are not used
-    private void hideExtraLabels(){  //NOTE: This relies on the fall through of the switch statement
-        switch (numberOfLabelsNeeded){
-            case 0: label1.setText("");
-            case 1: label2.setText("");
-            case 2: label3.setText("");
-            case 3: label4.setText("");
+    private void hideExtraLabels() {  //NOTE: This relies on the fall through of the switch statement
+        switch (numberOfLabelsNeeded) {
+            case 0:
+                label1.setText("");
+            case 1:
+                label2.setText("");
+            case 2:
+                label3.setText("");
+            case 3:
+                label4.setText("");
         }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        ((ContactManagerApplication)getApplication()).mainActivity.updateContacts();
     }
 }
