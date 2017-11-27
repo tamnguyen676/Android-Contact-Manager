@@ -13,7 +13,7 @@ public class ViewContact extends AppCompatActivity {
 
     TextView nameTxt, label1, label2, label3, label4, field1, field2, field3, field4;
     String phone, email, address, group;
-    int numberOfLabelsNeeded = 0;   //This keeps track of how many labels we need.
+    int numberOfLabelsNeeded;   //This keeps track of how many labels we need.
     Contact contact;
 
 
@@ -40,37 +40,8 @@ public class ViewContact extends AppCompatActivity {
 
         if (extras != null){
             contact = (Contact)extras.getSerializable("CONTACT");
-            nameTxt.setText(contact.getName());
-            phone = contact.getPhone();
-            email = contact.getEmail();
-            address = contact.getAddress();
-            group = contact.getGroup();
 
-
-
-            //If not empty, then set the next available label to say "Phone" and display phone number beneath
-            if (phone.compareTo("") != 0){
-                numberOfLabelsNeeded++; //Updates counter to know how many labels have been used
-                setText("Phone",phone);
-            }
-
-            //Same as above, but with email
-            if (email.compareTo("") != 0){
-                numberOfLabelsNeeded++;
-                setText("Email",email);
-            }
-
-            if (address.compareTo("") != 0){
-                numberOfLabelsNeeded++;
-                setText("Address",address);
-            }
-
-            if (group.compareTo("") != 0){
-                numberOfLabelsNeeded++;
-                setText("Group",group);
-            }
-
-            hideExtraLabels();  //Makes the labels we don't use invisible.
+            updateFields();
 
             buttonEdit.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -83,6 +54,39 @@ public class ViewContact extends AppCompatActivity {
         }
         else
             this.finish();
+    }
+
+    private void updateFields() {
+        numberOfLabelsNeeded = 0;
+        nameTxt.setText(contact.getName());
+        phone = contact.getPhone();
+        email = contact.getEmail();
+        address = contact.getAddress();
+        group = contact.getGroup();
+
+        //If not empty, then set the next available label to say "Phone" and display phone number beneath
+        if (phone.compareTo("") != 0){
+            numberOfLabelsNeeded++; //Updates counter to know how many labels have been used
+            setText("Phone",phone);
+        }
+
+        //Same as above, but with email
+        if (email.compareTo("") != 0){
+            numberOfLabelsNeeded++;
+            setText("Email",email);
+        }
+
+        if (address.compareTo("") != 0){
+            numberOfLabelsNeeded++;
+            setText("Address",address);
+        }
+
+        if (group.compareTo("") != 0){
+            numberOfLabelsNeeded++;
+            setText("Group",group);
+        }
+
+        hideExtraLabels();  //Makes the labels we don't use invisible.
     }
 
     private void setText(String label,String info){
@@ -129,5 +133,9 @@ public class ViewContact extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         ((ContactManagerApplication)getApplication()).mainActivity.updateContacts();
+        if(data != null){
+            contact = (Contact)data.getExtras().getSerializable("CONTACT");
+        }
+        updateFields();
     }
 }

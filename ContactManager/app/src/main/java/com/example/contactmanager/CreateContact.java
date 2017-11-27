@@ -1,5 +1,6 @@
 package com.example.contactmanager;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -50,8 +51,11 @@ public class CreateContact extends AppCompatActivity {
             public void onClick(View view) {
                 Contact newContact = new Contact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString(),groupTxt.getText().toString());
                 updateContact(oldData, newContact);
+                Intent data = new Intent();
+                data.putExtra("CONTACT",newContact);
+                setResult(RESULT_OK, data);
                 finish();
-                Toast.makeText(getApplicationContext(), nameTxt.getText().toString()+" has been added to your Contacts!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), nameTxt.getText().toString()+" has been saved to your Contacts!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -95,9 +99,7 @@ public class CreateContact extends AppCompatActivity {
     }
 
     private void updateContact(Bundle oldData, Contact newContact){
-        System.out.println("Updating");
         if(oldData != null){ //If there is an old version of the contact, delete it first
-            System.out.println("Deleting");
             Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
             MainActivity.Contacts.remove(oldContact);
             if(oldContact.getGroup() != ""){ //If they belonged to a group, remove them from it
