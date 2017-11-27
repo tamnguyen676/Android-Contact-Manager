@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ((ContactManagerApplication)getApplication()).mainActivity = this;
 
         //contactListView = (ListView) findViewById(R.id.listView);
         contactRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
@@ -83,14 +84,18 @@ public class MainActivity extends AppCompatActivity {
 
     //after returning from activity update list view
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Collections.sort(Contacts); //Sorts contacts in alphabetical order
-        contactAdapter.updateList(Contacts);
+        updateContacts();
     }
 
     public void viewContact(int contact){
         Intent viewContactIntent = new Intent(MainActivity.this, ViewContact.class);
         viewContactIntent.putExtra("CONTACT", Contacts.get(contact));
         startActivity(viewContactIntent);
+    }
+
+    public void updateContacts(){
+        Collections.sort(Contacts); //Sorts contacts in alphabetical order
+        contactAdapter.updateList(Contacts);
     }
 
 }

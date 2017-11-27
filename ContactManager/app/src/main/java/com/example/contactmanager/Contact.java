@@ -34,6 +34,33 @@ public class Contact implements Comparable<Contact>, Serializable{
         return _name.compareTo(contact.getName());
     }
 
+    @Override
+    public boolean equals(Object o){
+        Contact other = (Contact)o;
+        if(!other.getName().equals(_name)) {
+            System.out.println(other.getName());
+            System.out.println(_name);
+            return false;
+        }
+        if(!other.getPhone().equals(_phone)) {
+            System.out.println("Phone");
+            return false;
+        }
+        if(!other.getEmail().equals(_email)) {
+            System.out.println("Email");
+            return false;
+        }
+        if(!other.getAddress().equals(_address)) {
+            System.out.println("Addr");
+            return false;
+        }
+        if(!other.getGroup().equals(_group)) {
+            System.out.println("Group");
+            return false;
+        }
+        return true;
+    }
+
     public String getName(){
         return _name;
     }
