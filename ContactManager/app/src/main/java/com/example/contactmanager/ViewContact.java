@@ -1,10 +1,12 @@
 package com.example.contactmanager;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 
@@ -12,6 +14,7 @@ public class ViewContact extends AppCompatActivity {
 
 
     TextView nameTxt, label1, label2, label3, label4, field1, field2, field3, field4;
+    ImageButton buttonText, buttonMail, buttonCall, buttonMap;
     String phone, email, address, group;
     int numberOfLabelsNeeded;   //This keeps track of how many labels we need.
     Contact contact;
@@ -33,6 +36,46 @@ public class ViewContact extends AppCompatActivity {
         field3 = (TextView) findViewById(R.id.field3);
         field4 = (TextView) findViewById(R.id.field4);
 
+        buttonText = (ImageButton) findViewById(R.id.btnText);
+        buttonText.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent smsIntent = new Intent(Intent.ACTION_VIEW);
+                smsIntent.setData(Uri.parse("smsto:" + phone));
+                startActivity(smsIntent);
+            }
+        });
+
+        buttonCall = (ImageButton) findViewById(R.id.btnCall);
+        buttonCall.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                callIntent.setData(Uri.parse("tel:" + phone));
+                startActivity(callIntent);
+            }
+        });
+
+        buttonMail = (ImageButton) findViewById(R.id.btnMail);
+        buttonMail.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent mailIntent = new Intent(Intent.ACTION_SENDTO);
+                mailIntent.setData(Uri.parse("mailto:"));
+                mailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {email});
+                startActivity(mailIntent);
+            }
+        });
+
+        buttonMap = (ImageButton) findViewById(R.id.btnMap);
+        buttonMap.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW);
+                mapIntent.setData(Uri.parse("geo:0,0?q=" + Uri.encode(address)));
+                startActivity(mapIntent);
+            }
+        });
 
         final Button buttonEdit = (Button) findViewById(R.id.btnEdit);
 
@@ -87,6 +130,29 @@ public class ViewContact extends AppCompatActivity {
         }
 
         hideExtraLabels();  //Makes the labels we don't use invisible.
+
+        if(phone.equals("")){
+            buttonCall.setEnabled(false);
+            buttonText.setEnabled(false);
+        }
+        else{
+            buttonCall.setEnabled(true);
+            buttonText.setEnabled(true);
+        }
+
+        if(email.equals("")){
+            buttonMail.setEnabled(false);
+        }
+        else{
+            buttonMail.setEnabled(true);
+        }
+
+        if(address.equals("")){
+            buttonMap.setEnabled(false);
+        }
+        else{
+            buttonMap.setEnabled(true);
+        }
     }
 
     private void setText(String label,String info){
