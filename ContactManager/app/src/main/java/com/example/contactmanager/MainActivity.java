@@ -1,7 +1,11 @@
 package com.example.contactmanager;
 
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,6 +30,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static Context context;
     static ArrayList<Contact> Contacts = new ArrayList<Contact>();
     static ArrayList<Group> Groups = new ArrayList<Group>();
     RecyclerView contactRecyclerView;   //Reference object to the RecyclerView
@@ -64,6 +69,18 @@ public class MainActivity extends AppCompatActivity {
         tabSpec.setContent(R.id.tabBlockedList);
         tabSpec.setIndicator("Blocked");
         tabHost.addTab(tabSpec);
+
+        if (Build.VERSION.SDK_INT < 23) {}
+        else if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
+        {
+            if(shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)){
+                Toast.makeText(this, "Read External Storage permission is needed to select picture from device", Toast.LENGTH_SHORT).show();
+            }
+
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 13); //request permissions
+
+
+        }
 
         //Gets RecyclerView ready for contact list
         LinearLayoutManager layoutManager

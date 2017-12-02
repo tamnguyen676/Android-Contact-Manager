@@ -1,21 +1,28 @@
 package com.example.contactmanager;
 
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.io.File;
 
 
 public class ViewContact extends AppCompatActivity {
 
 
+
     TextView nameTxt, label1, label2, label3, label4, field1, field2, field3, field4;
     ImageButton buttonText, buttonMail, buttonCall, buttonMap;
     String phone, email, address, group;
+    ImageView imgProfilePic;
     int numberOfLabelsNeeded;   //This keeps track of how many labels we need.
     Contact contact;
 
@@ -26,6 +33,7 @@ public class ViewContact extends AppCompatActivity {
         super.onCreate((SavedInstanceState));
         setContentView((R.layout.activity_view_contact));
 
+        imgProfilePic = (ImageView) findViewById(R.id.imgProfilePic);
         nameTxt = (TextView) findViewById(R.id.txtName);
         label1 = (TextView) findViewById(R.id.label1);
         label2 = (TextView) findViewById(R.id.label2);
@@ -35,6 +43,9 @@ public class ViewContact extends AppCompatActivity {
         field2 = (TextView) findViewById(R.id.field2);
         field3 = (TextView) findViewById(R.id.field3);
         field4 = (TextView) findViewById(R.id.field4);
+
+
+
 
         buttonText = (ImageButton) findViewById(R.id.btnText);
         buttonText.setOnClickListener(new View.OnClickListener(){
@@ -99,6 +110,8 @@ public class ViewContact extends AppCompatActivity {
             this.finish();
     }
 
+
+
     private void updateFields() {
         numberOfLabelsNeeded = 0;
         nameTxt.setText(contact.getName());
@@ -106,6 +119,7 @@ public class ViewContact extends AppCompatActivity {
         email = contact.getEmail();
         address = contact.getAddress();
         group = contact.getGroup();
+        imgProfilePic.setImageURI(Uri.parse(contact.getImageUri()));
 
         //If not empty, then set the next available label to say "Phone" and display phone number beneath
         if (phone.compareTo("") != 0){

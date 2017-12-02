@@ -56,12 +56,13 @@
         android:layout_height="51dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="108dp"
         android:gravity="center_vertical"
         android:paddingLeft="0dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textSize="30sp"
-        app:layout_constraintEnd_toStartOf="@+id/btnEdit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -90,10 +91,10 @@
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.027"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.129" />
+        app:layout_constraintVertical_bias="0.311" />
 
     <TextView
         android:id="@+id/field1"
@@ -212,5 +213,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/label4"
         app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/imgProfilePic"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/txtName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/no_photo" />
 
 </android.support.constraint.ConstraintLayout>

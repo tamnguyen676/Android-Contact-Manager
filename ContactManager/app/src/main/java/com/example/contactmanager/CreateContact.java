@@ -1,6 +1,18 @@
 package com.example.contactmanager;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.Build;
+import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -8,13 +20,24 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 
 public class CreateContact extends AppCompatActivity {
 
+
+    public static final int PROFILE_PICTURE_EDIT = 10;
+    public static final int MY_GALLERY_REQUEST = 11;
     EditText nameTxt, phoneTxt, emailTxt, addressTxt, groupTxt;
+    ImageView imgSetProfilePic;
+    Uri imageUri = null;
     Bundle oldData;
 
     @Override
@@ -28,6 +51,50 @@ public class CreateContact extends AppCompatActivity {
         emailTxt = (EditText) findViewById(R.id.txtEmail);
         addressTxt = (EditText) findViewById(R.id.txtAddress);
         groupTxt = (EditText) findViewById(R.id.txtGroup);
+        imgSetProfilePic = (ImageView) findViewById(R.id.imgSetProfilePicture);
+
+        //check version, if version is less than 23 then run, otherwise check for permission to read storage
+        if (Build.VERSION.SDK_INT < 23) {
+            imgSetProfilePic.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view){
+                    Intent intent =  new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(intent, PROFILE_PICTURE_EDIT);
+
+                }
+
+            });
+        } else {
+            if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
+            {
+                if(shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)){
+                    Toast.makeText(this, "Read External Storage permission is needed to select picture from device", Toast.LENGTH_SHORT).show();
+                }
+
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_GALLERY_REQUEST); //request permissions
+
+
+            } else {
+
+                imgSetProfilePic.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view){
+                        Intent intent =  new Intent(Intent.ACTION_PICK,
+                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(intent, PROFILE_PICTURE_EDIT);
+
+                    }
+
+                });
+
+
+            }
+
+        }
+
+
+
 
         oldData = this.getIntent().getExtras();
 
@@ -40,7 +107,12 @@ public class CreateContact extends AppCompatActivity {
             emailTxt.setText(currentContact.getEmail());
             addressTxt.setText(currentContact.getAddress());
             groupTxt.setText(currentContact.getGroup());
-
+            imageUri = Uri.parse(currentContact.getImageUri());
+            try {
+                imgSetProfilePic.setImageBitmap(uriToBitmap(imageUri)); //--------------------------
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             btnSaveContact.setEnabled(true);
         }
 
@@ -49,7 +121,11 @@ public class CreateContact extends AppCompatActivity {
         btnSaveContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Contact newContact = new Contact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString(),groupTxt.getText().toString());
+
+                //if imageUri is null then no image was selected, set to default photo.
+                if(imageUri == null)
+                    imageUri = Uri.parse("android.resource://com.example.contactmanager/drawable/no_photo");
+                Contact newContact = new Contact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString(),groupTxt.getText().toString(), imageUri.toString());
                 updateContact(oldData, newContact);
                 Intent data = new Intent();
                 data.putExtra("CONTACT",newContact);
@@ -78,6 +154,35 @@ public class CreateContact extends AppCompatActivity {
 
     }
 
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(resultCode == RESULT_OK);
+            if(requestCode == PROFILE_PICTURE_EDIT){ //return from gallery
+
+                //address of the image
+                imageUri = data.getData();
+
+                try {
+                    imgSetProfilePic.setImageBitmap(uriToBitmap(imageUri));
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+    }
+
+    //accepts a Uri and converts it into a bitmap
+    private Bitmap uriToBitmap(Uri imgUri) throws IOException{
+        ParcelFileDescriptor parcelFileDescriptor = getContentResolver().openFileDescriptor(imgUri, "r");
+        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+
+        Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+
+        parcelFileDescriptor.close();
+        return bitmap;
+    }
+
     private void addContact(Contact newContact) {
 
         MainActivity.Contacts.add(newContact); //Create the contact
@@ -102,7 +207,7 @@ public class CreateContact extends AppCompatActivity {
         if(oldData != null){ //If there is an old version of the contact, delete it first
             Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
             MainActivity.Contacts.remove(oldContact);
-            if(oldContact.getGroup() != ""){ //If they belonged to a group, remove them from it
+            if(!oldContact.getGroup().isEmpty()){ //If they belonged to a group, remove them from it
                 Group oldGroup = MainActivity.Groups.get(existingGroup(oldContact.getGroup()));
                 oldGroup.removeContact(oldContact);
                 if(oldGroup.size == 0){ //The the group is empty now, delete it

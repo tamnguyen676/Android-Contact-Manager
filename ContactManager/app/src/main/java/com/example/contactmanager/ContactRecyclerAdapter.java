@@ -1,13 +1,16 @@
 package com.example.contactmanager;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.view.View.OnClickListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecyclerAdapter.ContactViewHolder>{
@@ -23,11 +26,13 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
 
     public class ContactViewHolder extends RecyclerView.ViewHolder{
         public final TextView contactNameTextView;
+        public final ImageView contactImageView;
 
         public ContactViewHolder(View itemView) {
             super(itemView);
 
             contactNameTextView = (TextView) itemView.findViewById(R.id.contactName);
+            contactImageView = (ImageView) itemView.findViewById(R.id.imgListProfilePicture);
         }
     }
 
@@ -52,6 +57,8 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         String contactInfo = contact.getName();
 
         holder.contactNameTextView.setText(contactInfo);
+        holder.contactImageView.setImageURI(Uri.parse(contact.getImageUri()));
+
         holder.contactNameTextView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){

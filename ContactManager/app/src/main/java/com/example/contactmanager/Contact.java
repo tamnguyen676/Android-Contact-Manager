@@ -3,6 +3,7 @@ package com.example.contactmanager;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
+import android.net.Uri;
 
 /**
  * Created by Artem on 10/21/17.
@@ -10,22 +11,24 @@ import java.io.Serializable;
 
 public class Contact implements Comparable<Contact>, Serializable{
 
-    private String _name, _phone, _email, _address, _group;
+    private String _name, _phone, _email, _address, _group, _imageUri;
 
-    public Contact(String name, String phone, String email, String address) {
+    public Contact(String name, String phone, String email, String address, String imageUri) {
         _name = name;
         _phone = phone;
         _email = email;
         _address = address;
         _group = "";
+        _imageUri = imageUri;
 
     }
-    public Contact(String name, String phone, String email, String address, String group) {
+    public Contact(String name, String phone, String email, String address, String group, String imageUri) {
         _name = name;
         _phone = phone;
         _email = email;
         _address = address;
         _group = group;
+        _imageUri = imageUri;
     }
 
     //Allows for sorting based on name of contact
@@ -76,4 +79,6 @@ public class Contact implements Comparable<Contact>, Serializable{
         return _address;
     }
     public String getGroup() { return _group; }
+
+    public String getImageUri(){return _imageUri;}
 }
