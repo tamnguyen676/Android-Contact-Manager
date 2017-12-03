@@ -48,17 +48,9 @@ public class CreateContact extends AppCompatActivity {
 
         //check version, if version is less than 23 then run, otherwise check for permission to read storage
         if (Build.VERSION.SDK_INT < 23) {
-            imgSetProfilePic.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view){
-                    Intent intent =  new Intent(Intent.ACTION_PICK,
-                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, PROFILE_PICTURE_EDIT);
-
-                }
-
-            });
-        } else {
+            addImageListener(imgSetProfilePic);
+        }
+        else {
             if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
             {
                 if(shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)){
@@ -69,19 +61,7 @@ public class CreateContact extends AppCompatActivity {
 
 
             } else {
-
-                imgSetProfilePic.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View view){
-                        Intent intent =  new Intent(Intent.ACTION_PICK,
-                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        startActivityForResult(intent, PROFILE_PICTURE_EDIT);
-
-                    }
-
-                });
-
-
+                addImageListener(imgSetProfilePic);
             }
 
         }
@@ -142,6 +122,20 @@ public class CreateContact extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
 
             }
+        });
+    }
+
+    private void addImageListener(ImageView picture) {
+        picture.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent intent =  new Intent(Intent.ACTION_OPEN_DOCUMENT,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+                startActivityForResult(intent, PROFILE_PICTURE_EDIT);
+
+            }
+
         });
     }
 

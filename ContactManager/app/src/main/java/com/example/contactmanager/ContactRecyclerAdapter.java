@@ -57,6 +57,7 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         String contactInfo = contact.getName();
 
         holder.contactNameTextView.setText(contactInfo);
+        System.out.println("List: " + contact.getImageUri());
         holder.contactImageView.setImageURI(Uri.parse(contact.getImageUri()));
 
         holder.contactNameTextView.setOnClickListener(new View.OnClickListener(){
