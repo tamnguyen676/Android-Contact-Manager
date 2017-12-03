@@ -12,6 +12,8 @@ import android.net.Uri;
 public class Contact implements Comparable<Contact>, Serializable{
 
     private String _name, _phone, _email, _address, _group, _imageUri;
+    private static int totalContacts;
+    private int id;
 
     public Contact(String name, String phone, String email, String address, String imageUri) {
         _name = name;
@@ -20,7 +22,7 @@ public class Contact implements Comparable<Contact>, Serializable{
         _address = address;
         _group = "";
         _imageUri = imageUri;
-
+        id = totalContacts++;
     }
     public Contact(String name, String phone, String email, String address, String group, String imageUri) {
         _name = name;
@@ -29,6 +31,7 @@ public class Contact implements Comparable<Contact>, Serializable{
         _address = address;
         _group = group;
         _imageUri = imageUri;
+        id = totalContacts++;
     }
 
     //Allows for sorting based on name of contact
@@ -81,4 +84,9 @@ public class Contact implements Comparable<Contact>, Serializable{
     public String getGroup() { return _group; }
 
     public String getImageUri(){return _imageUri;}
+    public int getId(){return id;}
+
+    public static void setTotalContacts(int total){
+        totalContacts = total;
+    }
 }

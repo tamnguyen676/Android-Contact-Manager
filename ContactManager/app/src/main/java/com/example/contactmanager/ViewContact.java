@@ -22,6 +22,7 @@ public class ViewContact extends AppCompatActivity {
     TextView nameTxt, label1, label2, label3, label4, field1, field2, field3, field4;
     ImageButton buttonText, buttonMail, buttonCall, buttonMap;
     String phone, email, address, group;
+    int id;
     ImageView imgProfilePic;
     int numberOfLabelsNeeded;   //This keeps track of how many labels we need.
     Contact contact;
@@ -43,9 +44,6 @@ public class ViewContact extends AppCompatActivity {
         field2 = (TextView) findViewById(R.id.field2);
         field3 = (TextView) findViewById(R.id.field3);
         field4 = (TextView) findViewById(R.id.field4);
-
-
-
 
         buttonText = (ImageButton) findViewById(R.id.btnText);
         buttonText.setOnClickListener(new View.OnClickListener(){
@@ -119,12 +117,13 @@ public class ViewContact extends AppCompatActivity {
         email = contact.getEmail();
         address = contact.getAddress();
         group = contact.getGroup();
+        id = contact.getId();
         imgProfilePic.setImageURI(Uri.parse(contact.getImageUri()));
 
         //If not empty, then set the next available label to say "Phone" and display phone number beneath
         if (phone.compareTo("") != 0){
             numberOfLabelsNeeded++; //Updates counter to know how many labels have been used
-            setText("Phone",phone);
+            setText("Phone",Integer.toString(id));
         }
 
         //Same as above, but with email

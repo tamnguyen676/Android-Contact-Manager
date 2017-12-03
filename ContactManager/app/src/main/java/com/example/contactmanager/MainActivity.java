@@ -35,7 +35,8 @@ public class MainActivity extends AppCompatActivity {
     static ArrayList<Group> Groups = new ArrayList<Group>();
     RecyclerView contactRecyclerView;   //Reference object to the RecyclerView
     private ContactRecyclerAdapter contactAdapter;
-    ListView groupListView ;
+    ListView groupListView;
+    int numberOfContacts;
 
     private TextView label1, label2, label3, label4;
 
