@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -120,10 +121,12 @@ public class ViewContact extends AppCompatActivity {
         id = contact.getId();
         imgProfilePic.setImageURI(Uri.parse(contact.getImageUri()));
 
+        Log.i("Database","ID #" + Integer.toString(id));
+
         //If not empty, then set the next available label to say "Phone" and display phone number beneath
         if (phone.compareTo("") != 0){
             numberOfLabelsNeeded++; //Updates counter to know how many labels have been used
-            setText("Phone",Integer.toString(id));
+            setText("Phone",phone);
         }
 
         //Same as above, but with email

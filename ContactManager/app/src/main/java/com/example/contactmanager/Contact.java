@@ -22,8 +22,19 @@ public class Contact implements Comparable<Contact>, Serializable{
         _address = address;
         _group = "";
         _imageUri = imageUri;
-        id = totalContacts++;
+        id = totalContacts++;   //Todo fix bug where id is incremented on edit
     }
+
+    public Contact(String name, String phone, String email, String address, String imageUri, int contactId) {
+        _name = name;
+        _phone = phone;
+        _email = email;
+        _address = address;
+        _group = "";
+        _imageUri = imageUri;
+        id = contactId;
+    }
+
     public Contact(String name, String phone, String email, String address, String group, String imageUri) {
         _name = name;
         _phone = phone;
@@ -32,6 +43,16 @@ public class Contact implements Comparable<Contact>, Serializable{
         _group = group;
         _imageUri = imageUri;
         id = totalContacts++;
+    }
+
+    public Contact(String name, String phone, String email, String address, String group, String imageUri, int contactId) {
+        _name = name;
+        _phone = phone;
+        _email = email;
+        _address = address;
+        _group = group;
+        _imageUri = imageUri;
+        id = contactId;
     }
 
     //Allows for sorting based on name of contact

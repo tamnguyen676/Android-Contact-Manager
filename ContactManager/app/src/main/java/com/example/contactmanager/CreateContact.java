@@ -1,33 +1,26 @@
 package com.example.contactmanager;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.File;
 import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 
 public class CreateContact extends AppCompatActivity {
@@ -131,7 +124,7 @@ public class CreateContact extends AppCompatActivity {
                 data.putExtra("CONTACT",newContact);
                 setResult(RESULT_OK, data);
                 finish();
-                Toast.makeText(getApplicationContext(), nameTxt.getText().toString()+" has been saved to your Contacts!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), nameTxt.getText().toString()+" has been saved to your contacts!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -150,8 +143,6 @@ public class CreateContact extends AppCompatActivity {
 
             }
         });
-
-
     }
 
 
@@ -183,9 +174,9 @@ public class CreateContact extends AppCompatActivity {
         return bitmap;
     }
 
-    private void addContact(Contact newContact) {
+    private void addContactToArray(Contact newContact) {
 
-        MainActivity.Contacts.add(newContact); //Create the contact
+        MainActivity.contacts.add(newContact); //Create the contact
 
         if(!newContact.getGroup().equals(""))  //if grouptxt field has a String
         {
@@ -200,13 +191,28 @@ public class CreateContact extends AppCompatActivity {
                 MainActivity.Groups.get(existingGroup(newContact.getGroup())).addContact(newContact); // if group already exists adds contact to the group
             }
         }
+    }
 
+    public ContactEntity contactToEntity(Contact contact){
+        ContactEntity newContact = new ContactEntity();
+        newContact.setName(contact.getName());
+        newContact.setId(contact.getId());
+        newContact.setPhone(contact.getPhone());
+        newContact.setAddress(contact.getAddress());
+        newContact.setEmail(contact.getEmail());
+        newContact.setImage(contact.getImageUri());
+
+        return newContact;
+    }
+
+    private void addContactToDatabase(Contact newContact){
+        MainActivity.db.dao().insertContact(contactToEntity(newContact));
     }
 
     private void updateContact(Bundle oldData, Contact newContact){
         if(oldData != null){ //If there is an old version of the contact, delete it first
             Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
-            MainActivity.Contacts.remove(oldContact);
+            MainActivity.contacts.remove(oldContact);
             if(!oldContact.getGroup().isEmpty()){ //If they belonged to a group, remove them from it
                 Group oldGroup = MainActivity.Groups.get(existingGroup(oldContact.getGroup()));
                 oldGroup.removeContact(oldContact);
@@ -216,8 +222,11 @@ public class CreateContact extends AppCompatActivity {
             }
 
         }
-        addContact(newContact); //Add the new contact
+        addContactToArray(newContact); //Add the new contact
+        addContactToDatabase(newContact);   //Adds contact to database
+        Log.i("Database","Added contact");
     }
+
 
     public int existingGroup(String a)  //Checks List of groups to see that group has been created
     {
