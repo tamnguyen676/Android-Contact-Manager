@@ -26,7 +26,7 @@ public class Group {
     }
 
     public void addContact(Contact a) {
-        Contacts.add(new Contact(a.getName(), a.getPhone(), a.getEmail(), a.getAddress(), a.getGroup()));
+        Contacts.add(new Contact(a.getName(), a.getPhone(), a.getEmail(), a.getAddress(), a.getGroup(), a.getImageUri()));
         size++;
     }
 

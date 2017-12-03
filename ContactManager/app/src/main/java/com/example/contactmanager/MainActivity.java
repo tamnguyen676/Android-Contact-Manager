@@ -1,36 +1,37 @@
 package com.example.contactmanager;
 
 
+import android.Manifest;
+import android.arch.persistence.room.Room;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-
 
 
 public class MainActivity extends AppCompatActivity {
 
-    static ArrayList<Contact> Contacts = new ArrayList<Contact>();
+    public static Context context;
+    static ArrayList<Contact> contacts = new ArrayList<Contact>();
     static ArrayList<Group> Groups = new ArrayList<Group>();
     RecyclerView contactRecyclerView;   //Reference object to the RecyclerView
     private ContactRecyclerAdapter contactAdapter;
-    ListView groupListView ;
+    ListView groupListView;
+    int numberOfContacts;
+    public static ContactDatabase db;
 
     private TextView label1, label2, label3, label4;
 
@@ -65,6 +66,16 @@ public class MainActivity extends AppCompatActivity {
         tabSpec.setIndicator("Blocked");
         tabHost.addTab(tabSpec);
 
+        if (Build.VERSION.SDK_INT < 23) {}
+        else if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
+        {
+            if(shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)){
+                Toast.makeText(this, "Read External Storage permission is needed to select picture from device", Toast.LENGTH_SHORT).show();
+            }
+
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 13); //request permissions
+        }
+
         //Gets RecyclerView ready for contact list
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -81,6 +92,12 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(createContactIntent, 1);
             }
         });
+
+        db = Room.databaseBuilder(getApplicationContext(),
+                ContactDatabase.class, "contact-database").allowMainThreadQueries().build();
+
+        fillListWithDatabase();
+        updateContacts();
     }
 
     //after returning from activity update list view
@@ -89,16 +106,29 @@ public class MainActivity extends AppCompatActivity {
         updateContacts();
     }
 
-
     public void viewContact(int contact){
         Intent viewContactIntent = new Intent(MainActivity.this, ViewContact.class);
-        viewContactIntent.putExtra("CONTACT", Contacts.get(contact));
+        viewContactIntent.putExtra("CONTACT", contacts.get(contact));
         startActivity(viewContactIntent);
     }
 
     public void updateContacts(){
-        Collections.sort(Contacts); //Sorts contacts in alphabetical order
-        contactAdapter.updateList(Contacts);
+        Collections.sort(contacts); //Sorts contacts in alphabetical order
+        contactAdapter.updateList(contacts);
+    }
+    public void fillListWithDatabase(){
+        ContactEntity[] contactEntityList = db.dao().loadAllContacts();
+        for (int i = 0; i < contactEntityList.length; i++){
+            contacts.add(entityToContact(contactEntityList[i]));
+        }
+    }
+
+    public Contact entityToContact(ContactEntity entity){
+        //Todo fix case where there is no group/image
+        Contact contact = new Contact(entity.getName(),entity.getPhone(),entity.getEmail(),
+                entity.getAddress(),entity.getImage(),entity.getId());
+
+        return contact;
     }
 
 }
