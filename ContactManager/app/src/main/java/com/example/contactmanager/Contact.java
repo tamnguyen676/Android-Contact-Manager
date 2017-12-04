@@ -45,7 +45,7 @@ public class Contact implements Comparable<Contact>, Serializable{
         id = totalContacts++;
     }
 
-    public Contact(String name, String phone, String email, String address, String group, String imageUri, int contactId) {
+    public Contact(int contactId, String name, String phone, String email, String address, String imageUri, String group) {
         _name = name;
         _phone = phone;
         _email = email;

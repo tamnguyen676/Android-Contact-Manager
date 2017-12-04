@@ -17,6 +17,7 @@ public class ContactEntity {
     public String email;
     public String address;
     public String image;
+    public String group;
     
     public int getId(){
         return id;
@@ -41,6 +42,8 @@ public class ContactEntity {
     public String getImage(){
         return image;
     }
+
+    public String getGroup() { return group; }
     
     public void setId(int id){
         this.id = id;
@@ -65,5 +68,7 @@ public class ContactEntity {
     public void setImage(String image){
         this.image = image;
     }
+
+    public void setGroup(String group) { this.group = group;}
 
 }

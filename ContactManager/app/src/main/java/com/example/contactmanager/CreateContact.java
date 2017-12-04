@@ -48,9 +48,17 @@ public class CreateContact extends AppCompatActivity {
 
         //check version, if version is less than 23 then run, otherwise check for permission to read storage
         if (Build.VERSION.SDK_INT < 23) {
-            addImageListener(imgSetProfilePic);
-        }
-        else {
+            imgSetProfilePic.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view){
+                    Intent intent =  new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(intent, PROFILE_PICTURE_EDIT);
+
+                }
+
+            });
+        } else {
             if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
             {
                 if(shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)){
@@ -61,7 +69,19 @@ public class CreateContact extends AppCompatActivity {
 
 
             } else {
-                addImageListener(imgSetProfilePic);
+
+                imgSetProfilePic.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view){
+                        Intent intent =  new Intent(Intent.ACTION_PICK,
+                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(intent, PROFILE_PICTURE_EDIT);
+
+                    }
+
+                });
+
+
             }
 
         }
@@ -125,20 +145,6 @@ public class CreateContact extends AppCompatActivity {
         });
     }
 
-    private void addImageListener(ImageView picture) {
-        picture.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Intent intent =  new Intent(Intent.ACTION_OPEN_DOCUMENT,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-                startActivityForResult(intent, PROFILE_PICTURE_EDIT);
-
-            }
-
-        });
-    }
-
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if(resultCode == RESULT_OK);
@@ -177,12 +183,12 @@ public class CreateContact extends AppCompatActivity {
             if(existingGroup(newContact.getGroup()) == -1) // if group doesn't already exist
             {
 
-                MainActivity.Groups.add(new Group(newContact.getGroup(),newContact)); //adds contact to the group
+                MainActivity.groups.add(new Group(newContact.getGroup(),newContact)); //adds contact to the group
                 System.out.println("Created a new group");
             }
             else {
                 System.out.println("Trying to add to existing group");
-                MainActivity.Groups.get(existingGroup(newContact.getGroup())).addContact(newContact); // if group already exists adds contact to the group
+                MainActivity.groups.get(existingGroup(newContact.getGroup())).addContact(newContact); // if group already exists adds contact to the group
             }
         }
     }
@@ -193,6 +199,7 @@ public class CreateContact extends AppCompatActivity {
         newContact.setId(contact.getId());
         newContact.setPhone(contact.getPhone());
         newContact.setAddress(contact.getAddress());
+        newContact.setGroup(contact.getGroup());
         newContact.setEmail(contact.getEmail());
         newContact.setImage(contact.getImageUri());
 
@@ -208,10 +215,10 @@ public class CreateContact extends AppCompatActivity {
             Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
             MainActivity.contacts.remove(oldContact);
             if(!oldContact.getGroup().isEmpty()){ //If they belonged to a group, remove them from it
-                Group oldGroup = MainActivity.Groups.get(existingGroup(oldContact.getGroup()));
+                Group oldGroup = MainActivity.groups.get(existingGroup(oldContact.getGroup()));
                 oldGroup.removeContact(oldContact);
                 if(oldGroup.size == 0){ //The the group is empty now, delete it
-                    MainActivity.Groups.remove(oldGroup);
+                    MainActivity.groups.remove(oldGroup);
                 }
             }
 
@@ -226,8 +233,8 @@ public class CreateContact extends AppCompatActivity {
     {
         int x = 0;
 
-            while (x < MainActivity.Groups.size()) {
-                if (a.equals(MainActivity.Groups.get(x).getGroupName()))
+            while (x < MainActivity.groups.size()) {
+                if (a.equals(MainActivity.groups.get(x).getGroupName()))
                     return x;
                 x++;
             }

@@ -26,10 +26,11 @@ public class MainActivity extends AppCompatActivity {
 
     public static Context context;
     static ArrayList<Contact> contacts = new ArrayList<Contact>();
-    static ArrayList<Group> Groups = new ArrayList<Group>();
+    static ArrayList<Group> groups = new ArrayList<Group>();
     RecyclerView contactRecyclerView;   //Reference object to the RecyclerView
+    RecyclerView groupRecyclerView;
     private ContactRecyclerAdapter contactAdapter;
-    ListView groupListView;
+    private GroupRecyclerAdapter groupAdapter;
     int numberOfContacts;
     public static ContactDatabase db;
 
@@ -41,9 +42,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ((ContactManagerApplication)getApplication()).mainActivity = this;
+        //context.deleteDatabase("contact-database");
 
         contactRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        groupListView = (ListView) findViewById(R.id.grouplistView);
+        groupRecyclerView = (RecyclerView) findViewById(R.id.recyclerView2);
 
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         tabSpec.setIndicator("Blocked");
         tabHost.addTab(tabSpec);
 
-        if (Build.VERSION.SDK_INT < 23) {}
+        if (Build.VERSION.SDK_INT < 27) {}
         else if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
         {
             if(shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)){
@@ -83,6 +85,13 @@ public class MainActivity extends AppCompatActivity {
         contactAdapter = new ContactRecyclerAdapter(0,this);
         contactRecyclerView.setAdapter(contactAdapter);
 
+        //Gets RecyclerView ready for group list
+        LinearLayoutManager layoutManager2
+                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        groupRecyclerView.setLayoutManager(layoutManager2);
+        groupAdapter = new GroupRecyclerAdapter(0,this);
+        groupRecyclerView.setAdapter(groupAdapter);
+
         final Button btnAdd = (Button) findViewById(R.id.btnAdd);
         //if add was clicked, then start new activity
         btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
         db = Room.databaseBuilder(getApplicationContext(),
                 ContactDatabase.class, "contact-database").allowMainThreadQueries().build();
-
+       // context.deleteDatabase("contact-database");
         fillListWithDatabase();
         updateContacts();
     }
@@ -111,24 +120,50 @@ public class MainActivity extends AppCompatActivity {
         viewContactIntent.putExtra("CONTACT", contacts.get(contact));
         startActivity(viewContactIntent);
     }
-
+    public void viewGroup(int group){
+        Intent viewContactIntent = new Intent(MainActivity.this, ViewGroupActivity.class);
+        viewContactIntent.putExtra("GROUP", groups.get(group));
+        startActivity(viewContactIntent);
+    }
     public void updateContacts(){
         Collections.sort(contacts); //Sorts contacts in alphabetical order
+        Collections.sort(groups);
         contactAdapter.updateList(contacts);
+        groupAdapter.updateList(groups);
     }
     public void fillListWithDatabase(){
         ContactEntity[] contactEntityList = db.dao().loadAllContacts();
         for (int i = 0; i < contactEntityList.length; i++){
             contacts.add(entityToContact(contactEntityList[i]));
+
+            //loads contacts to their groups
+            if(!entityToContact(contactEntityList[i]).getGroup().equals(""))  //if grouptxt field has a String
+            {
+                if(existingGroup(entityToContact(contactEntityList[i]).getGroup()) == -1) // if group doesn't already exist
+                    groups.add(new Group(entityToContact(contactEntityList[i]).getGroup(),entityToContact(contactEntityList[i]))); //adds contact to the group
+
+                else
+                    groups.get(existingGroup(entityToContact(contactEntityList[i]).getGroup())).addContact(entityToContact(contactEntityList[i])); // if group already exists adds contact to the group
+
+            }
         }
     }
 
     public Contact entityToContact(ContactEntity entity){
         //Todo fix case where there is no group/image
-        Contact contact = new Contact(entity.getName(),entity.getPhone(),entity.getEmail(),
-                entity.getAddress(),entity.getImage(),entity.getId());
+        Contact contact = new Contact(entity.getId(), entity.getName(),entity.getPhone(),entity.getEmail(), entity.getAddress(),entity.getImage(),entity.getGroup());
 
         return contact;
     }
 
+    public int existingGroup(String a)  //Checks List of groups to see that group has been created
+    {
+        int x = 0;
+        while (x < groups.size()) {
+            if (a.equals(groups.get(x).getGroupName()))
+                return x;
+            x++;
+        }
+        return -1;
+    }
 }

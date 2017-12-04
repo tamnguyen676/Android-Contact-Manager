@@ -17,11 +17,17 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
     private int mNumItems;
     private ArrayList<Contact> contactList;
     MainActivity mainActivity;
-
-
+    ViewGroupActivity viewGroupActivity;
+    int switcher;
     public ContactRecyclerAdapter(int numItems, MainActivity mainActivity){
         mNumItems = numItems;
         this.mainActivity = mainActivity;
+        switcher = 0;
+    }
+    public ContactRecyclerAdapter(int numItems, ViewGroupActivity viewGroupActivity){
+        mNumItems = numItems;
+        this.viewGroupActivity = viewGroupActivity;
+        switcher = 1;
     }
 
     public class ContactViewHolder extends RecyclerView.ViewHolder{
@@ -57,13 +63,16 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         String contactInfo = contact.getName();
 
         holder.contactNameTextView.setText(contactInfo);
-        System.out.println("List: " + contact.getImageUri());
         holder.contactImageView.setImageURI(Uri.parse(contact.getImageUri()));
 
         holder.contactNameTextView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                mainActivity.viewContact(position);
+                if(switcher == 1)
+                    viewGroupActivity.viewContact(position);
+                else
+                    mainActivity.viewContact(position);
+
             }
         });
     }

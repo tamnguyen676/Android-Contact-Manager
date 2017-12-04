@@ -2,13 +2,14 @@ package com.example.contactmanager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.Serializable;
 
 /**
  * Created by Artem on 10/21/17.
  */
 
-public class Group {
-    List<Contact> Contacts;
+public class Group implements Comparable <Group>, Serializable{
+    ArrayList<Contact> Contacts;
     private String _name;
     public int size;
 
@@ -19,6 +20,10 @@ public class Group {
         addContact(a);
 
 
+    }
+    @Override
+    public int compareTo(Group group) {
+        return _name.compareTo(group.getGroupName());
     }
 
     public String getGroupName(){
