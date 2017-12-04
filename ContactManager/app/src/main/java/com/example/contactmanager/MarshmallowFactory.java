@@ -10,6 +10,12 @@ import android.widget.Toast;
 //API level 23
 public class MarshmallowFactory extends AndroidVersionFactory {
 
+    /**
+     * Checks permissions and requests them if needed before adding a click listener to select a photo
+     *
+     * @param button The view to add the listener to
+     * @param context The calling activity
+     */
     public void addFileOpenListener(View button, Activity context){
         if(context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
         {

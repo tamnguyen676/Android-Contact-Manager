@@ -8,6 +8,12 @@ public abstract class AndroidVersionFactory {
 
     abstract void addFileOpenListener(View button, Activity context);
 
+    /**
+     * Adds a click listener to the button that will allow the user to select an image
+     *
+     * @param button The view to add the listener to
+     * @param context The calling activity
+     */
     protected void createListener(View button, final Activity context){
         button.setOnClickListener(new View.OnClickListener(){
             @Override
