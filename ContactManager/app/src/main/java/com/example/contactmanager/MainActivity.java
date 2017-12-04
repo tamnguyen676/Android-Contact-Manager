@@ -30,10 +30,13 @@ public class MainActivity extends AppCompatActivity {
     public static Context context;
     static ArrayList<Contact> contacts = new ArrayList<Contact>();  //Stores all contacts in a list
     static ArrayList<Group> groups = new ArrayList<Group>();    //Stores all groups in a list
+    static ArrayList<Contact> blockedcontacts = new ArrayList<Contact>();  //Stores all contacts in a list
     RecyclerView contactRecyclerView;   //Reference object to the RecyclerView
     RecyclerView groupRecyclerView;
+    RecyclerView blockedRecyclerView;
     private ContactRecyclerAdapter contactAdapter;
     private GroupRecyclerAdapter groupAdapter;
+    private BlockedRecyclerAdapter blockedcontactAdapter;
     int numberOfContacts;
     public static ContactDatabase db;
 
@@ -48,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         contactRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         groupRecyclerView = (RecyclerView) findViewById(R.id.recyclerView2);
-
+        blockedRecyclerView = (RecyclerView) findViewById(R.id.recyclerView3);
         setupAllTabs();
 
         checkPermissions();
@@ -105,6 +108,13 @@ public class MainActivity extends AppCompatActivity {
         groupRecyclerView.setLayoutManager(layoutManager2);
         groupAdapter = new GroupRecyclerAdapter(0,this);
         groupRecyclerView.setAdapter(groupAdapter);
+
+
+        LinearLayoutManager layoutManager3
+                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        blockedRecyclerView.setLayoutManager(layoutManager3);
+        blockedcontactAdapter = new BlockedRecyclerAdapter(0,this);
+        blockedRecyclerView.setAdapter(blockedcontactAdapter);
     }
 
     /**
@@ -227,6 +237,11 @@ public class MainActivity extends AppCompatActivity {
         viewContactIntent.putExtra("GROUP", groups.get(group));
         startActivity(viewContactIntent);
     }
+    public void viewBlockedContact(int contact){
+        Intent viewContactIntent = new Intent(MainActivity.this, ViewContact.class);
+        viewContactIntent.putExtra("CONTACT", blockedcontacts.get(contact));
+        startActivity(viewContactIntent);
+    }
 
     /**
      * Updates the main page with newly added or edited contacts and groups by
@@ -236,8 +251,10 @@ public class MainActivity extends AppCompatActivity {
     public void updateContacts(){
         Collections.sort(contacts); //Sorts contacts in alphabetical order
         Collections.sort(groups);
+        Collections.sort(blockedcontacts);
         contactAdapter.updateList(contacts);
         groupAdapter.updateList(groups);
+        blockedcontactAdapter.updateList(blockedcontacts);
     }
 
     /**

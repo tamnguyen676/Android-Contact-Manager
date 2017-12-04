@@ -116,21 +116,42 @@
         app:layout_constraintTop_toBottomOf="@+id/txtAddress" />
 
     <Button
+        android:id="@+id/btnBlockContact"
+        android:layout_width="368dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/holo_red_dark"
+        android:enabled="false"
+        android:text="Block Contact"
+        android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+        android:textColor="@android:color/background_light"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtAddress"
+        app:layout_constraintVertical_bias="0.439" />
+
+    <Button
         android:id="@+id/btnSaveContact"
         android:layout_width="368dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:background="@android:color/holo_green_dark"
         android:enabled="false"
         android:text="Save Contact"
         android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+        android:textColor="@android:color/background_light"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtAddress"
-        app:layout_constraintVertical_bias="0.806"
-        android:layout_marginRight="8dp" />
+        app:layout_constraintVertical_bias="0.806" />
 
     <ImageView
         android:id="@+id/imgSetProfilePicture"
