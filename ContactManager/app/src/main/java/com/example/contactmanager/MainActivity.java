@@ -29,8 +29,8 @@ import java.util.Collections;
 public class MainActivity extends AppCompatActivity {
 
     public static Context context;
-    static ArrayList<Contact> contacts = new ArrayList<Contact>();
-    static ArrayList<Group> groups = new ArrayList<Group>();
+    static ArrayList<Contact> contacts = new ArrayList<Contact>();  //Stores all contacts in a list
+    static ArrayList<Group> groups = new ArrayList<Group>();    //Stores all groups in a list
     RecyclerView contactRecyclerView;   //Reference object to the RecyclerView
     RecyclerView groupRecyclerView;
     private ContactRecyclerAdapter contactAdapter;
@@ -53,24 +53,13 @@ public class MainActivity extends AppCompatActivity {
 
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
+        TabHost.TabSpec tabSpec;
 
-        //sets up tab1
-        TabHost.TabSpec tabSpec =  tabHost.newTabSpec("list");
-        tabSpec.setContent(R.id.tabContactList);
-        tabSpec.setIndicator("List");
-        tabHost.addTab(tabSpec);
+        //Sets up tabs
+        setUpTab(tabHost,"list",R.id.tabContactList);
+        setUpTab(tabHost,"group",R.id.tabGroupList);
+        setUpTab(tabHost,"blocked",R.id.tabBlockedList);
 
-        //sets up tab2
-        tabSpec =  tabHost.newTabSpec("group");
-        tabSpec.setContent(R.id.tabGroupList);
-        tabSpec.setIndicator("Group");
-        tabHost.addTab(tabSpec);
-
-        //sets up tab3
-        tabSpec =  tabHost.newTabSpec("blocked");
-        tabSpec.setContent(R.id.tabBlockedList);
-        tabSpec.setIndicator("Blocked");
-        tabHost.addTab(tabSpec);
 
         if (Build.VERSION.SDK_INT < 27) {}
         else if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
@@ -145,6 +134,14 @@ public class MainActivity extends AppCompatActivity {
         fillListWithDatabase();
         Contact.setTotalContacts(contacts.size());
         updateContacts();
+    }
+
+    private void setUpTab(TabHost tabHost,String tag,int tabId) {
+        TabHost.TabSpec tabSpec;
+        tabSpec =  tabHost.newTabSpec(tag);
+        tabSpec.setContent(tabId);
+        tabSpec.setIndicator(tag.substring(0,1).toUpperCase() + tag.substring(1));
+        tabHost.addTab(tabSpec);
     }
 
     private void loadContacts(ArrayList<Contact> importedContacts) {

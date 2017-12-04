@@ -1,9 +1,6 @@
 package com.example.contactmanager;
 
-import android.support.annotation.NonNull;
-
 import java.io.Serializable;
-import android.net.Uri;
 
 /**
  * Created by Artem on 10/21/17.
@@ -11,77 +8,77 @@ import android.net.Uri;
 
 public class Contact implements Comparable<Contact>, Serializable{
 
-    private String _name, _phone, _email, _address, _group, _imageUri;
+    private String name, phone, email, address, group, imageUri;
     private static int totalContacts;
     private int id;
 
     public Contact(String name, String phone, String email, String address, String imageUri) {
-        _name = name;
-        _phone = phone;
-        _email = email;
-        _address = address;
-        _group = "";
-        _imageUri = imageUri;
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+        group = "";
+        this.imageUri = imageUri;
         id = totalContacts++;
     }
 
     public Contact(String name, String phone, String email, String address, String imageUri, int contactId) {
-        _name = name;
-        _phone = phone;
-        _email = email;
-        _address = address;
-        _group = "";
-        _imageUri = imageUri;
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+        group = "";
+        this.imageUri = imageUri;
         id = contactId;
     }
 
     public Contact(String name, String phone, String email, String address, String group, String imageUri) {
-        _name = name;
-        _phone = phone;
-        _email = email;
-        _address = address;
-        _group = group;
-        _imageUri = imageUri;
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+        this.group = group;
+        this.imageUri = imageUri;
         id = totalContacts++;
     }
 
     public Contact(String name, String phone, String email, String address, String group, String imageUri, int contactId) {
-        _name = name;
-        _phone = phone;
-        _email = email;
-        _address = address;
-        _group = group;
-        _imageUri = imageUri;
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+        this.group = group;
+        this.imageUri = imageUri;
         id = contactId;
     }
 
     //Allows for sorting based on name of contact
     @Override
     public int compareTo(Contact contact) {
-        return _name.compareTo(contact.getName());
+        return name.compareTo(contact.getName());
     }
 
     @Override
     public boolean equals(Object o){
         Contact other = (Contact)o;
-        if(!other.getName().equals(_name)) {
+        if(!other.getName().equals(name)) {
             System.out.println(other.getName());
-            System.out.println(_name);
+            System.out.println(name);
             return false;
         }
-        if(!other.getPhone().equals(_phone)) {
+        if(!other.getPhone().equals(phone)) {
             System.out.println("Phone");
             return false;
         }
-        if(!other.getEmail().equals(_email)) {
+        if(!other.getEmail().equals(email)) {
             System.out.println("Email");
             return false;
         }
-        if(!other.getAddress().equals(_address)) {
+        if(!other.getAddress().equals(address)) {
             System.out.println("Addr");
             return false;
         }
-        if(!other.getGroup().equals(_group)) {
+        if(!other.getGroup().equals(group)) {
             System.out.println("Group");
             return false;
         }
@@ -89,22 +86,22 @@ public class Contact implements Comparable<Contact>, Serializable{
     }
 
     public String getName(){
-        return _name;
+        return name;
     }
 
     public String getPhone(){
-        return _phone;
+        return phone;
     }
 
     public String getEmail(){
-        return _email;
+        return email;
     }
     public String getAddress(){
-        return _address;
+        return address;
     }
-    public String getGroup() { return _group; }
+    public String getGroup() { return group; }
 
-    public String getImageUri(){return _imageUri;}
+    public String getImageUri(){return imageUri;}
     public int getId(){return id;}
 
     public static int getTotalContacts(){
