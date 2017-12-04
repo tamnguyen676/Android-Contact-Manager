@@ -89,6 +89,7 @@ public class CreateContact extends AppCompatActivity {
         oldData = this.getIntent().getExtras();
 
         final Button btnSaveContact = (Button) findViewById(R.id.btnSaveContact);
+        final Button btnBlockContact = (Button) findViewById(R.id.btnBlockContact);
 
         if(oldData != null){
             Contact currentContact = (Contact)oldData.getSerializable("CONTACT");
@@ -106,10 +107,30 @@ public class CreateContact extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 btnSaveContact.setEnabled(true);
+                btnBlockContact.setEnabled(true);
             }
         }
 
+        btnBlockContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Contact newContact = null;
+                newContact = new Contact(nameTxt.getText().toString(),
+                        phoneTxt.getText().toString(), emailTxt.getText().toString(),
+                        addressTxt.getText().toString(), groupTxt.getText().toString(),
+                        imageUri.toString(),id);
+            updateBlockedContact(oldData, newContact);
+            Intent data = new Intent();
+            data.putExtra("CONTACT",newContact);
+            setResult(RESULT_OK, data);
+            finish();
+            Toast.makeText(getApplicationContext(), nameTxt.getText().toString()+" has been Blocked!", Toast.LENGTH_SHORT).show();
 
+
+
+
+            }
+        });
 
         btnSaveContact.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,6 +169,7 @@ public class CreateContact extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 btnSaveContact.setEnabled(!nameTxt.getText().toString().trim().isEmpty());
+                btnBlockContact.setEnabled(!nameTxt.getText().toString().trim().isEmpty());
             }
 
             @Override
@@ -195,6 +217,34 @@ public class CreateContact extends AppCompatActivity {
 
         parcelFileDescriptor.close();
         return bitmap;
+    }
+
+    /**
+     * Updates a contact and adds them to the blocked list
+     *
+     * @param oldData intent data containing the old contact, if there is existing contact data to edit
+     * @param newContact the new contact to be stored
+     */
+    private void updateBlockedContact(Bundle oldData,Contact newContact){
+        if(oldData != null){ //If there is an old version of the contact, delete it first
+            Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
+            MainActivity.contacts.remove(oldContact);
+            //Todo update database
+            if(!oldContact.getGroup().isEmpty()){ //If they belonged to a group, remove them from it
+                try{
+                    Group oldGroup = MainActivity.groups.get(existingGroup(oldContact.getGroup()));
+                    oldGroup.removeContact(oldContact);
+                    if(oldGroup.size == 0){ //The the group is empty now, delete it
+                        MainActivity.groups.remove(oldGroup);
+                    }
+                }
+                catch(NonexistentGroupException exception){
+                    System.out.print("Tried to remove a contact from a group that doesn't exist: " + exception.groupName);
+                }
+            }
+        }
+        MainActivity.blockedcontacts.add(newContact); //Create the contact
+
     }
 
     /**
