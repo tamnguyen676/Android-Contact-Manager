@@ -49,44 +49,13 @@ public class CreateContact extends AppCompatActivity {
         imgSetProfilePic = (ImageView) findViewById(R.id.imgSetProfilePicture);
 
         //check version, if version is less than 23 then run, otherwise check for permission to read storage
+        AndroidVersionFactory factory;
         if (Build.VERSION.SDK_INT < 23) {
-            imgSetProfilePic.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view){
-                    Intent intent =  new Intent(Intent.ACTION_PICK,
-                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, PROFILE_PICTURE_EDIT);
-
-                }
-
-            });
+            factory = new LollipopFactory();
         } else {
-            if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
-            {
-                if(shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)){
-                    Toast.makeText(this, "Read External Storage permission is needed to select picture from device", Toast.LENGTH_SHORT).show();
-                }
-
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_GALLERY_REQUEST); //request permissions
-
-
-            } else {
-
-                imgSetProfilePic.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View view){
-                        Intent intent =  new Intent(Intent.ACTION_PICK,
-                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        startActivityForResult(intent, PROFILE_PICTURE_EDIT);
-
-                    }
-
-                });
-
-
-            }
-
+            factory = new MarshmallowFactory();
         }
+        factory.addFileOpenListener(imgSetProfilePic, CreateContact.this);
 
 
         ArrayList<Contact> importList = (ArrayList<Contact>) getIntent().getSerializableExtra("IMPORT_LIST");
@@ -210,7 +179,7 @@ public class CreateContact extends AppCompatActivity {
         });
     }
 
-
+    //When returning from an open image activity, get the image to use for the contact
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if(resultCode == RESULT_OK);
             if(requestCode == PROFILE_PICTURE_EDIT){ //return from gallery
@@ -233,7 +202,13 @@ public class CreateContact extends AppCompatActivity {
             }
     }
 
-    //accepts a Uri and converts it into a bitmap
+    /**
+     * Accepts a Uri encoded file path and returns the image data stored there
+     *
+     * @param imgUri the image file path
+     * @return the bitmap image stored at file path
+     *
+     */
     private Bitmap uriToBitmap(Uri imgUri) throws IOException{
         ParcelFileDescriptor parcelFileDescriptor = getContentResolver().openFileDescriptor(imgUri, "r");
         FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
@@ -244,6 +219,7 @@ public class CreateContact extends AppCompatActivity {
         return bitmap;
     }
 
+<<<<<<< HEAD
     private void updateBlockedContact(Bundle oldData,Contact newContact){
         if(oldData != null){ //If there is an old version of the contact, delete it first
             Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
@@ -260,25 +236,34 @@ public class CreateContact extends AppCompatActivity {
         MainActivity.blockedcontacts.add(newContact); //Create the contact
 
     }
+=======
+    /**
+     * Adds a contact to the list of contacts and their designated group. The group is created if it doesn't already exist
+     *
+     * @param newContact the contact being added to the list
+     */
+>>>>>>> cd5db61d391d4babda2a409410f08090342e5251
     private void addContactToArray(Contact newContact) {
 
         MainActivity.contacts.add(newContact); //Create the contact
 
         if(!newContact.getGroup().equals(""))  //if grouptxt field has a String
         {
-            if(existingGroup(newContact.getGroup()) == -1) // if group doesn't already exist
-            {
-
-                MainActivity.groups.add(new Group(newContact.getGroup(),newContact)); //adds contact to the group
-                System.out.println("Created a new group");
-            }
-            else {
-                System.out.println("Trying to add to existing group");
+            try{
                 MainActivity.groups.get(existingGroup(newContact.getGroup())).addContact(newContact); // if group already exists adds contact to the group
+            }
+            catch(NonexistentGroupException exception){ // if group doesn't already exist
+                MainActivity.groups.add(new Group(exception.groupName,newContact)); //adds contact to the group
             }
         }
     }
 
+    /**
+     * Transfers contact data into an object that can be stored in the database
+     *
+     * @param contact the contact to retireve data from
+     * @return an object containing the contact's data which can be stored in the database
+     */
     public static ContactEntity contactToEntity(Contact contact){
         ContactEntity newContact = new ContactEntity();
         newContact.setName(contact.getName());
@@ -292,20 +277,36 @@ public class CreateContact extends AppCompatActivity {
         return newContact;
     }
 
+    /**
+     * Adds the contact to the database
+     *
+     * @param newContact the new contact to be added
+     */
     private void addContactToDatabase(Contact newContact){
         MainActivity.db.dao().insertContact(contactToEntity(newContact));
     }
 
+    /**
+     * Stores the new contact in the list and in the database. If the new contact is an edited version of an existing one, the old version is removed
+     *
+     * @param oldData intent data containing the old contact, if there is existing contact data to edit
+     * @param newContact the new contact to be stored
+     */
     private void updateContact(Bundle oldData, Contact newContact){
         if(oldData != null){ //If there is an old version of the contact, delete it first
             Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
             MainActivity.contacts.remove(oldContact);
             //Todo update database
             if(!oldContact.getGroup().isEmpty()){ //If they belonged to a group, remove them from it
-                Group oldGroup = MainActivity.groups.get(existingGroup(oldContact.getGroup()));
-                oldGroup.removeContact(oldContact);
-                if(oldGroup.size == 0){ //The the group is empty now, delete it
-                    MainActivity.groups.remove(oldGroup);
+                try{
+                    Group oldGroup = MainActivity.groups.get(existingGroup(oldContact.getGroup()));
+                    oldGroup.removeContact(oldContact);
+                    if(oldGroup.size == 0){ //The the group is empty now, delete it
+                        MainActivity.groups.remove(oldGroup);
+                    }
+                }
+                catch(NonexistentGroupException exception){
+                    System.out.print("Tried to remove a contact from a group that doesn't exist: " + exception.groupName);
                 }
             }
 
@@ -315,17 +316,33 @@ public class CreateContact extends AppCompatActivity {
         Log.i("Database","Added contact");
     }
 
-
-    public int existingGroup(String a)  //Checks List of groups to see that group has been created
+    /**
+     * Returns the index of the requested group, if it exists.
+     *
+     * @param groupName the name of the group to look for
+     * @return the index of the group in the group list
+     * @exception NonexistentGroupException thrown if the group name is not found in the group list
+     */
+    public int existingGroup(String groupName) throws NonexistentGroupException  //Checks List of groups to see that group has been created
     {
         int x = 0;
 
             while (x < MainActivity.groups.size()) {
-                if (a.equals(MainActivity.groups.get(x).getGroupName()))
+                if (groupName.equals(MainActivity.groups.get(x).getGroupName()))
                     return x;
                 x++;
             }
 
-        return -1;
+        throw new NonexistentGroupException(groupName);
+    }
+
+    private class NonexistentGroupException extends Exception{
+        public String groupName;
+
+        public NonexistentGroupException(String groupName){
+            this.groupName = groupName;
+        }
     }
 }
+
+

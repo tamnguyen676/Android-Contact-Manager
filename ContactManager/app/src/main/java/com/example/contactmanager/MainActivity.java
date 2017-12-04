@@ -5,11 +5,13 @@ import android.Manifest;
 import android.arch.persistence.room.Room;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.provider.ContactsContract;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -62,7 +64,19 @@ public class MainActivity extends AppCompatActivity {
         btnImport.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                importContacts(importedContacts);
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Import Contacts")
+                        .setMessage("Would you like to import existing contacts from the default contact app?")
+                        .setIcon(android.R.drawable.ic_menu_save)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                importContacts(importedContacts);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null)
+                        .show();
+
             }
         });
 
