@@ -34,6 +34,7 @@ public class CreateContact extends AppCompatActivity {
     Uri imageUri = null;
     Bundle oldData;
     private int id;
+    boolean blockedContact = false; //Determines if contact is already blocked
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,7 @@ public class CreateContact extends AppCompatActivity {
 
 
         ArrayList<Contact> importList = (ArrayList<Contact>) getIntent().getSerializableExtra("IMPORT_LIST");
+        oldData = this.getIntent().getExtras();
 
         if(importList != null){
             for(int i = 0; i < importList.size(); i++){
@@ -86,12 +88,10 @@ public class CreateContact extends AppCompatActivity {
             }
         }
 
-        oldData = this.getIntent().getExtras();
-
         final Button btnSaveContact = (Button) findViewById(R.id.btnSaveContact);
         final Button btnBlockContact = (Button) findViewById(R.id.btnBlockContact);
 
-        if(oldData != null){
+        if (oldData != null){
             Contact currentContact = (Contact)oldData.getSerializable("CONTACT");
             if(currentContact != null){
                 nameTxt.setText(currentContact.getName());
@@ -106,6 +106,16 @@ public class CreateContact extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                if (MainActivity.blockedcontacts.contains(currentContact)){
+                    btnBlockContact.setText("Unblock Contact");
+                    blockedContact = true;
+                }
+                else {
+                    btnBlockContact.setText("Block Contact");
+                    blockedContact = false;
+                }
+
                 btnSaveContact.setEnabled(true);
                 btnBlockContact.setEnabled(true);
             }
@@ -118,17 +128,28 @@ public class CreateContact extends AppCompatActivity {
                 newContact = new Contact(nameTxt.getText().toString(),
                         phoneTxt.getText().toString(), emailTxt.getText().toString(),
                         addressTxt.getText().toString(), groupTxt.getText().toString(),
-                        imageUri.toString(),id);
-            updateBlockedContact(oldData, newContact);
-            Intent data = new Intent();
-            data.putExtra("CONTACT",newContact);
-            setResult(RESULT_OK, data);
-            finish();
-            Toast.makeText(getApplicationContext(), nameTxt.getText().toString()+" has been Blocked!", Toast.LENGTH_SHORT).show();
+                        imageUri.toString(), id);
 
-
-
-
+                if (blockedContact == false) {   //Blocking contact
+                    updateBlockedContact(oldData, newContact);
+                    Intent data = new Intent();
+                    data.putExtra("CONTACT", newContact);
+                    setResult(RESULT_OK, data);
+                    finish();
+                    Toast.makeText(getApplicationContext(),
+                            nameTxt.getText().toString() + " has been Blocked!",
+                            Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    unblockContact(oldData,newContact);
+                    Intent data = new Intent();
+                    data.putExtra("CONTACT", newContact);
+                    setResult(RESULT_OK, data);
+                    finish();
+                    Toast.makeText(getApplicationContext(),
+                            nameTxt.getText().toString() + " has been unblocked!",
+                            Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -234,7 +255,7 @@ public class CreateContact extends AppCompatActivity {
             Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
             MainActivity.contacts.remove(oldContact);
             ((ContactManagerApplication)getApplication()).mainActivity.updateContacts();
-            MainActivity.db.dao().deleteContact(CreateContact.contactToEntity(newContact));
+            MainActivity.db.dao().deleteContact(CreateContact.contactToEntity(newContact)); //Todo try oldContact
             //Todo update database
             if(!oldContact.getGroup().isEmpty()){ //If they belonged to a group, remove them from it
                 try{
@@ -252,6 +273,36 @@ public class CreateContact extends AppCompatActivity {
         MainActivity.blockedcontacts.add(newContact); //Create the contact
         addBlockedContactToDatabase(newContact);
     }
+
+    /**
+     * Unblocks a contact add deletes them from blocked list. Add them to normal.
+     * @param oldData intent data containing the old contact, if there is existing contact data to edit
+     * @param newContact the new contact to be stored
+     */
+    private void unblockContact(Bundle oldData,Contact newContact){
+        Contact oldContact = null;
+        if(oldData != null){ //If there is an old version of the contact
+            oldContact = (Contact)oldData.getSerializable("CONTACT");
+            MainActivity.contacts.add(newContact);
+            ((ContactManagerApplication)getApplication()).mainActivity.updateContacts();
+            MainActivity.db.dao().insertContact(CreateContact.contactToEntity(newContact));
+            //Todo update database
+            if(!newContact.getGroup().isEmpty()){ //If they belonged to a group, add them to it again
+                try{
+                    Group group = MainActivity.groups.get(existingGroup(newContact.getGroup()));
+                    group.addContact(newContact);
+                }
+                catch(NonexistentGroupException exception){
+                    //If group does not exist, create it
+                    MainActivity.groups.add(new Group(newContact.getGroup(),newContact));
+                }
+            }
+        }
+        MainActivity.blockedcontacts.remove(oldContact); //Remove the blocked contact from database
+        MainActivity.db2.dao().deleteContact(contactToEntity(oldContact));
+    }
+
+
 
     /**
      * Adds a contact to the list of contacts and their designated group. The group is created if it doesn't already exist
@@ -303,6 +354,8 @@ public class CreateContact extends AppCompatActivity {
     private void addBlockedContactToDatabase(Contact newContact){
         MainActivity.db2.dao().insertContact(contactToEntity(newContact));
     }
+
+
     /**
      * Stores the new contact in the list and in the database. If the new contact is an edited version of an existing one, the old version is removed
      *

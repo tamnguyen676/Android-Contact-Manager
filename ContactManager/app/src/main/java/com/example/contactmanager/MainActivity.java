@@ -97,12 +97,13 @@ public class MainActivity extends AppCompatActivity {
                 ContactDatabase.class, "contacts-database").allowMainThreadQueries().build();
         db2 = Room.databaseBuilder(getApplicationContext(),
                 ContactDatabase.class, "contacts-database2").allowMainThreadQueries().build();
+
         //Used for debugging purposes. Uncomment to start app with fresh database.
         //deleteAllContacts();
-        //deleteAllContacts();
-        //deleteAllContacts2();
-        fillListWithDatabase();
-        fillListWithDatabase2();
+        //deleteAllBlocked();
+
+        fillContactListWithDatabase();
+        fillBlockedListWithDatabase();
         Contact.setTotalContacts(contacts.size());
         updateContacts();
     }   //End onCreate()
@@ -278,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
      * Accesses the SQLite database and fills the contacts ArrayList with all users from
      * from the database.
      */
-    public void fillListWithDatabase(){
+    public void fillContactListWithDatabase(){
         ContactEntity[] contactEntityList = db.dao().loadAllContacts();
         for (int i = 0; i < contactEntityList.length; i++){
             contacts.add(entityToContact(contactEntityList[i]));
@@ -296,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void fillListWithDatabase2() {
+    public void fillBlockedListWithDatabase() {
         ContactEntity[] contactEntityList = db2.dao().loadAllContacts();
         for (int i = 0; i < contactEntityList.length; i++) {
             blockedcontacts.add(entityToContact(contactEntityList[i]));
@@ -326,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
             db.dao().deleteContact(contactEntities[i]);
         }
     }
-    public void deleteAllContacts2(){
+    public void deleteAllBlocked(){
         ContactEntity[] contactEntities = db2.dao().loadAllContacts();
         for (int i = 0; i < contactEntities.length; i++){
             db2.dao().deleteContact(contactEntities[i]);
