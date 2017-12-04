@@ -32,6 +32,7 @@ public class CreateContact extends AppCompatActivity {
     ImageView imgSetProfilePic;
     Uri imageUri = null;
     Bundle oldData;
+    private int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +82,9 @@ public class CreateContact extends AppCompatActivity {
 
                 });
 
+
             }
+
         }
 
 
@@ -90,7 +93,7 @@ public class CreateContact extends AppCompatActivity {
         oldData = this.getIntent().getExtras();
 
         final Button btnSaveContact = (Button) findViewById(R.id.btnSaveContact);
-        final Button btnBlockContact = (Button) findViewById(R.id.btnBlockContact);
+
         if(oldData != null){
             Contact currentContact = (Contact)oldData.getSerializable("CONTACT");
             nameTxt.setText(currentContact.getName());
@@ -99,13 +102,13 @@ public class CreateContact extends AppCompatActivity {
             addressTxt.setText(currentContact.getAddress());
             groupTxt.setText(currentContact.getGroup());
             imageUri = Uri.parse(currentContact.getImageUri());
+            id = currentContact.getId();
             try {
                 imgSetProfilePic.setImageBitmap(uriToBitmap(imageUri)); //--------------------------
             } catch (IOException e) {
                 e.printStackTrace();
             }
             btnSaveContact.setEnabled(true);
-            btnBlockContact.setEnabled(true);
         }
 
 
@@ -113,34 +116,29 @@ public class CreateContact extends AppCompatActivity {
         btnSaveContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+            //if imageUri is null then no image was selected, set to default photo.
+            if(imageUri == null)
+                imageUri = Uri.parse("android.resource://com.example.contactmanager/drawable/no_photo");
 
-                //if imageUri is null then no image was selected, set to default photo.
-                if(imageUri == null)
-                    imageUri = Uri.parse("android.resource://com.example.contactmanager/drawable/no_photo");
-                Contact newContact = new Contact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString(),groupTxt.getText().toString(), imageUri.toString());
-                updateContact(oldData, newContact);
-                Intent data = new Intent();
-                data.putExtra("CONTACT",newContact);
-                setResult(RESULT_OK, data);
-                finish();
-                Toast.makeText(getApplicationContext(), nameTxt.getText().toString()+" has been saved to your contacts!", Toast.LENGTH_SHORT).show();
+            Contact newContact = null;
+            if (oldData == null) {
+                newContact = new Contact(nameTxt.getText().toString(),
+                        phoneTxt.getText().toString(), emailTxt.getText().toString(),
+                        addressTxt.getText().toString(), groupTxt.getText().toString(),
+                        imageUri.toString());
             }
-        });
-        btnBlockContact.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //if imageUri is null then no image was selected, set to default photo.
-                if(imageUri == null)
-                    imageUri = Uri.parse("android.resource://com.example.contactmanager/drawable/no_photo");
-                Contact newContact = new Contact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString(),groupTxt.getText().toString(), imageUri.toString());
-                updateContact(oldData, newContact);
-                addContactToBlocked(newContact);
-                Intent data = new Intent();
-                data.putExtra("CONTACT",newContact);
-                setResult(RESULT_OK, data);
-                finish();
-                Toast.makeText(getApplicationContext(), nameTxt.getText().toString()+" has been blocked!", Toast.LENGTH_SHORT).show();
+            else {
+                newContact = new Contact(nameTxt.getText().toString(),
+                        phoneTxt.getText().toString(), emailTxt.getText().toString(),
+                        addressTxt.getText().toString(), groupTxt.getText().toString(),
+                        imageUri.toString(),id);
+            }
+            updateContact(oldData, newContact);
+            Intent data = new Intent();
+            data.putExtra("CONTACT",newContact);
+            setResult(RESULT_OK, data);
+            finish();
+            Toast.makeText(getApplicationContext(), nameTxt.getText().toString()+" has been saved to your contacts!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -152,7 +150,6 @@ public class CreateContact extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 btnSaveContact.setEnabled(!nameTxt.getText().toString().trim().isEmpty());
-                btnBlockContact.setEnabled(!nameTxt.getText().toString().trim().isEmpty());
             }
 
             @Override
@@ -168,7 +165,12 @@ public class CreateContact extends AppCompatActivity {
             if(requestCode == PROFILE_PICTURE_EDIT){ //return from gallery
 
                 //address of the image
-                imageUri = data.getData();
+                if (data.getData() != null) {
+                    imageUri = data.getData();
+                }
+                else {
+                    imageUri = Uri.parse("android.resource://com.example.contactmanager/drawable/no_photo");
+                }
 
                 try {
                     imgSetProfilePic.setImageBitmap(uriToBitmap(imageUri));
@@ -194,6 +196,7 @@ public class CreateContact extends AppCompatActivity {
     private void addContactToArray(Contact newContact) {
 
         MainActivity.contacts.add(newContact); //Create the contact
+
         if(!newContact.getGroup().equals(""))  //if grouptxt field has a String
         {
             if(existingGroup(newContact.getGroup()) == -1) // if group doesn't already exist
@@ -208,11 +211,8 @@ public class CreateContact extends AppCompatActivity {
             }
         }
     }
-    private void addContactToBlocked(Contact newContact) {
-        MainActivity.blockedcontacts.add(newContact); //Create the contact
 
-    }
-    public ContactEntity contactToEntity(Contact contact){
+    public static ContactEntity contactToEntity(Contact contact){
         ContactEntity newContact = new ContactEntity();
         newContact.setName(contact.getName());
         newContact.setId(contact.getId());
@@ -233,6 +233,7 @@ public class CreateContact extends AppCompatActivity {
         if(oldData != null){ //If there is an old version of the contact, delete it first
             Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
             MainActivity.contacts.remove(oldContact);
+            //Todo update database
             if(!oldContact.getGroup().isEmpty()){ //If they belonged to a group, remove them from it
                 Group oldGroup = MainActivity.groups.get(existingGroup(oldContact.getGroup()));
                 oldGroup.removeContact(oldContact);

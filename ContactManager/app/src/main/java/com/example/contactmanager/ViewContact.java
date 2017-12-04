@@ -1,9 +1,11 @@
 package com.example.contactmanager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -22,7 +25,7 @@ public class ViewContact extends AppCompatActivity {
 
     TextView nameTxt, label1, label2, label3, label4, field1, field2, field3, field4;
     ImageButton buttonText, buttonMail, buttonCall, buttonMap;
-    String phone, email, address, group;
+    String phone, email, address, group, imageUri;
     int id;
     ImageView imgProfilePic;
     int numberOfLabelsNeeded;   //This keeps track of how many labels we need.
@@ -88,6 +91,7 @@ public class ViewContact extends AppCompatActivity {
         });
 
         final Button buttonEdit = (Button) findViewById(R.id.btnEdit);
+        final Button buttonDelete = (Button) findViewById(R.id.btnDelete);
 
         Bundle extras = this.getIntent().getExtras();
 
@@ -102,6 +106,24 @@ public class ViewContact extends AppCompatActivity {
                     Intent editContactIntent = new Intent(ViewContact.this, CreateContact.class );
                     editContactIntent.putExtra("CONTACT", contact);
                     startActivityForResult(editContactIntent, 1);
+                }
+            });
+
+            buttonDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new AlertDialog.Builder(ViewContact.this)
+                            .setTitle("Remove Contact")
+                            .setMessage("Are you sure that you want to remove " + contact.getName() + " from your contacts?")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    deleteContact();
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, null)
+                            .show();
                 }
             });
         }
@@ -119,7 +141,8 @@ public class ViewContact extends AppCompatActivity {
         address = contact.getAddress();
         group = contact.getGroup();
         id = contact.getId();
-        imgProfilePic.setImageURI(Uri.parse(contact.getImageUri()));
+        imageUri = contact.getImageUri();
+        imgProfilePic.setImageURI(Uri.parse(imageUri));
 
         Log.i("Database","ID #" + Integer.toString(id));
 
@@ -219,5 +242,14 @@ public class ViewContact extends AppCompatActivity {
             contact = (Contact)data.getExtras().getSerializable("CONTACT");
         }
         updateFields();
+    }
+
+    private void deleteContact(){
+        Toast.makeText(ViewContact.this, "Removed " + contact.getName() + " from contacts", Toast.LENGTH_SHORT).show();
+        MainActivity.contacts.remove(contact);
+        Contact.setTotalContacts(Contact.getTotalContacts() - 1);
+        ((ContactManagerApplication)getApplication()).mainActivity.updateContacts();
+        MainActivity.db.dao().deleteContact(CreateContact.contactToEntity(contact));
+        this.finish();
     }
 }
