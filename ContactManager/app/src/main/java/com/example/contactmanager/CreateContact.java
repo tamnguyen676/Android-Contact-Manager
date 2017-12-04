@@ -406,7 +406,7 @@ public class CreateContact extends AppCompatActivity {
         throw new NonexistentGroupException(groupName);
     }
 
-    private class NonexistentGroupException extends Exception{
+    public class NonexistentGroupException extends Exception{
         public String groupName;
 
         public NonexistentGroupException(String groupName){
