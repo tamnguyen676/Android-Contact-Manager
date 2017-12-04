@@ -35,6 +35,6 @@
         android:layout_height="33dp"
         android:layout_gravity="end"
         android:layout_marginRight="10dp"
-        android:background="@drawable/ic_action_name"
+        android:background="@android:drawable/ic_menu_upload"
         android:scaleType="fitCenter" />
     </android.support.v7.widget.Toolbar>

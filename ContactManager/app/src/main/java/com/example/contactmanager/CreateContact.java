@@ -49,44 +49,13 @@ public class CreateContact extends AppCompatActivity {
         imgSetProfilePic = (ImageView) findViewById(R.id.imgSetProfilePicture);
 
         //check version, if version is less than 23 then run, otherwise check for permission to read storage
+        AndroidVersionFactory factory;
         if (Build.VERSION.SDK_INT < 23) {
-            imgSetProfilePic.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view){
-                    Intent intent =  new Intent(Intent.ACTION_PICK,
-                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, PROFILE_PICTURE_EDIT);
-
-                }
-
-            });
+            factory = new LollipopFactory();
         } else {
-            if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
-            {
-                if(shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)){
-                    Toast.makeText(this, "Read External Storage permission is needed to select picture from device", Toast.LENGTH_SHORT).show();
-                }
-
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_GALLERY_REQUEST); //request permissions
-
-
-            } else {
-
-                imgSetProfilePic.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View view){
-                        Intent intent =  new Intent(Intent.ACTION_PICK,
-                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        startActivityForResult(intent, PROFILE_PICTURE_EDIT);
-
-                    }
-
-                });
-
-
-            }
-
+            factory = new MarshmallowFactory();
         }
+        factory.addFileOpenListener(imgSetProfilePic, CreateContact.this);
 
 
         ArrayList<Contact> importList = (ArrayList<Contact>) getIntent().getSerializableExtra("IMPORT_LIST");
