@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class CreateContact extends AppCompatActivity {
@@ -88,7 +89,33 @@ public class CreateContact extends AppCompatActivity {
         }
 
 
+        ArrayList<Contact> importList = (ArrayList<Contact>) getIntent().getSerializableExtra("IMPORT_LIST");
 
+        if(importList != null){
+            for(int i = 0; i < importList.size(); i++){
+                nameTxt.setText(importList.get(i).getName());
+                phoneTxt.setText(importList.get(i).getPhone());
+                emailTxt.setText(importList.get(i).getEmail());
+                addressTxt.setText(importList.get(i).getAddress());
+                groupTxt.setText(importList.get(i).getGroup());
+                imageUri = Uri.parse(importList.get(i).getImageUri());
+                try {
+                    imgSetProfilePic.setImageBitmap(uriToBitmap(imageUri)); //--------------------------
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if(imageUri == null || imageUri.toString().isEmpty())
+                    imageUri = Uri.parse("android.resource://com.example.contactmanager/drawable/no_photo");
+                Contact newContact = new Contact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString(),groupTxt.getText().toString(), imageUri.toString());
+                updateContact(oldData, newContact);
+                Intent data = new Intent();
+                data.putExtra("CONTACT",newContact);
+                setResult(RESULT_OK, data);
+                finish();
+
+            }
+        }
 
         oldData = this.getIntent().getExtras();
 
@@ -96,19 +123,21 @@ public class CreateContact extends AppCompatActivity {
 
         if(oldData != null){
             Contact currentContact = (Contact)oldData.getSerializable("CONTACT");
-            nameTxt.setText(currentContact.getName());
-            phoneTxt.setText(currentContact.getPhone());
-            emailTxt.setText(currentContact.getEmail());
-            addressTxt.setText(currentContact.getAddress());
-            groupTxt.setText(currentContact.getGroup());
-            imageUri = Uri.parse(currentContact.getImageUri());
-            id = currentContact.getId();
-            try {
-                imgSetProfilePic.setImageBitmap(uriToBitmap(imageUri)); //--------------------------
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(currentContact != null){
+                nameTxt.setText(currentContact.getName());
+                phoneTxt.setText(currentContact.getPhone());
+                emailTxt.setText(currentContact.getEmail());
+                addressTxt.setText(currentContact.getAddress());
+                groupTxt.setText(currentContact.getGroup());
+                imageUri = Uri.parse(currentContact.getImageUri());
+                id = currentContact.getId();
+                try {
+                    imgSetProfilePic.setImageBitmap(uriToBitmap(imageUri)); //--------------------------
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                btnSaveContact.setEnabled(true);
             }
-            btnSaveContact.setEnabled(true);
         }
 
 

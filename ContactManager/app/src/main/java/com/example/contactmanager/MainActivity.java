@@ -3,14 +3,18 @@ package com.example.contactmanager;
 
 import android.Manifest;
 import android.arch.persistence.room.Room;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.Build;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -77,6 +81,38 @@ public class MainActivity extends AppCompatActivity {
 
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 13); //request permissions
         }
+        if(checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
+        {
+            if(shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)){
+                Toast.makeText(this, "Contact permissions needed to import", Toast.LENGTH_SHORT).show();
+            }
+
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 13); //request permissions
+        }
+
+        final Button btnImport = (Button) findViewById(R.id.btnImport);
+        final ArrayList<Contact> importedContacts = new ArrayList<Contact>();
+
+
+        btnImport.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                loadContacts(importedContacts);
+                Collections.sort(importedContacts);
+
+                for(int i = importedContacts.size() - 1; i >= 0; i--){
+                    if(contacts.contains(importedContacts.get(i)))
+                        importedContacts.remove(i);
+                }
+                if(importedContacts.size() == 0)
+                    Toast.makeText(MainActivity.this, "Contacts are up to date", Toast.LENGTH_LONG).show();
+                else{
+                    Intent importContacts = new Intent(MainActivity.this, CreateContact.class);
+                    importContacts.putExtra("IMPORT_LIST", importedContacts);
+                    startActivityForResult(importContacts, 1);
+                }
+            }
+        });
 
         //Gets RecyclerView ready for contact list
         LinearLayoutManager layoutManager
@@ -109,6 +145,38 @@ public class MainActivity extends AppCompatActivity {
         fillListWithDatabase();
         Contact.setTotalContacts(contacts.size());
         updateContacts();
+    }
+
+    private void loadContacts(ArrayList<Contact> importedContacts) {
+        ContentResolver contentResolver = getContentResolver();
+        Cursor cursor = null;
+
+        try{
+            cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+        } catch (Exception e){
+            Log.e("Error on contact", e.getMessage());
+        }
+
+        if(cursor.moveToFirst()){
+            do{
+                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                int hasPhoneNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
+
+                if(hasPhoneNumber > 0){
+                    Cursor cursor2 = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
+
+                    while(cursor2.moveToNext()) {
+                        String phoneNumber = cursor2.getString(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        importedContacts.add(new Contact(name, phoneNumber, "", "", "", ""));
+                    }
+                    cursor2.close();
+                }
+            }while(cursor.moveToNext());
+
+
+        }
+        cursor.close();
     }
 
     //after returning from activity update list view
