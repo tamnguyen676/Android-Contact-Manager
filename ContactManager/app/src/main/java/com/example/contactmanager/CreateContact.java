@@ -219,30 +219,39 @@ public class CreateContact extends AppCompatActivity {
         return bitmap;
     }
 
-<<<<<<< HEAD
+    /**
+     * Updates a contact and adds them to the blocked list
+     *
+     * @param oldData intent data containing the old contact, if there is existing contact data to edit
+     * @param newContact the new contact to be stored
+     */
     private void updateBlockedContact(Bundle oldData,Contact newContact){
         if(oldData != null){ //If there is an old version of the contact, delete it first
             Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
             MainActivity.contacts.remove(oldContact);
             //Todo update database
             if(!oldContact.getGroup().isEmpty()){ //If they belonged to a group, remove them from it
-                Group oldGroup = MainActivity.groups.get(existingGroup(oldContact.getGroup()));
-                oldGroup.removeContact(oldContact);
-                if(oldGroup.size == 0){ //The the group is empty now, delete it
-                    MainActivity.groups.remove(oldGroup);
+                try{
+                    Group oldGroup = MainActivity.groups.get(existingGroup(oldContact.getGroup()));
+                    oldGroup.removeContact(oldContact);
+                    if(oldGroup.size == 0){ //The the group is empty now, delete it
+                        MainActivity.groups.remove(oldGroup);
+                    }
+                }
+                catch(NonexistentGroupException exception){
+                    System.out.print("Tried to remove a contact from a group that doesn't exist: " + exception.groupName);
                 }
             }
         }
         MainActivity.blockedcontacts.add(newContact); //Create the contact
 
     }
-=======
+
     /**
      * Adds a contact to the list of contacts and their designated group. The group is created if it doesn't already exist
      *
      * @param newContact the contact being added to the list
      */
->>>>>>> cd5db61d391d4babda2a409410f08090342e5251
     private void addContactToArray(Contact newContact) {
 
         MainActivity.contacts.add(newContact); //Create the contact
