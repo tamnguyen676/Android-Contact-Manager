@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private GroupRecyclerAdapter groupAdapter;
     private BlockedRecyclerAdapter blockedcontactAdapter;
     int numberOfContacts;
-    public static ContactDatabase db;
+    public static ContactDatabase db, db2;
 
     private TextView label1, label2, label3, label4;
 
@@ -95,11 +95,14 @@ public class MainActivity extends AppCompatActivity {
         //SQLite database that stores all contacts
         db = Room.databaseBuilder(getApplicationContext(),
                 ContactDatabase.class, "contacts-database").allowMainThreadQueries().build();
-
+        db2 = Room.databaseBuilder(getApplicationContext(),
+                ContactDatabase.class, "contacts-database2").allowMainThreadQueries().build();
         //Used for debugging purposes. Uncomment to start app with fresh database.
         //deleteAllContacts();
-
+        //deleteAllContacts();
+        //deleteAllContacts2();
         fillListWithDatabase();
+        fillListWithDatabase2();
         Contact.setTotalContacts(contacts.size());
         updateContacts();
     }   //End onCreate()
@@ -293,6 +296,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void fillListWithDatabase2() {
+        ContactEntity[] contactEntityList = db2.dao().loadAllContacts();
+        for (int i = 0; i < contactEntityList.length; i++) {
+            blockedcontacts.add(entityToContact(contactEntityList[i]));
+        }
+    }
     /**
      * Converts a ContactEntity object used by the database to a Contact object used
      * by the rest of the program. All fields of the ContactEntity object is transferred
@@ -317,7 +326,12 @@ public class MainActivity extends AppCompatActivity {
             db.dao().deleteContact(contactEntities[i]);
         }
     }
-
+    public void deleteAllContacts2(){
+        ContactEntity[] contactEntities = db2.dao().loadAllContacts();
+        for (int i = 0; i < contactEntities.length; i++){
+            db2.dao().deleteContact(contactEntities[i]);
+        }
+    }
     /**
      * Finds the index of a group in the ArrayList given the name.
      *

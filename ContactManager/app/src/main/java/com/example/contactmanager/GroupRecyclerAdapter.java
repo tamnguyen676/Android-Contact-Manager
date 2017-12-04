@@ -36,7 +36,7 @@ public class GroupRecyclerAdapter extends RecyclerView.Adapter<GroupRecyclerAdap
     }
 
     @Override
-    public GroupRecyclerAdapter.GroupViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public GroupViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         int layoutIdForListItem = R.layout.recyclerview2_item;
         LayoutInflater inflater = LayoutInflater.from(context);

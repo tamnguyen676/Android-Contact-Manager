@@ -12,6 +12,7 @@ public class Contact implements Comparable<Contact>, Serializable{
     private static int totalContacts;
     private int id;
 
+
     public Contact(String name, String phone, String email, String address, String imageUri) {
         this.name = name;
         this.phone = phone;
@@ -19,6 +20,7 @@ public class Contact implements Comparable<Contact>, Serializable{
         this.address = address;
         group = "";
         this.imageUri = imageUri;
+
         id = totalContacts++;
     }
 
@@ -30,6 +32,7 @@ public class Contact implements Comparable<Contact>, Serializable{
         group = "";
         this.imageUri = imageUri;
         id = contactId;
+
     }
 
     public Contact(String name, String phone, String email, String address, String group, String imageUri) {

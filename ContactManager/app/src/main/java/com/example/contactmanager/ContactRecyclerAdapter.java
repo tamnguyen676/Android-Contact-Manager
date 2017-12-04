@@ -43,7 +43,7 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
     }
 
     @Override
-    public ContactRecyclerAdapter.ContactViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ContactViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         int layoutIdForListItem = R.layout.recyclerview_item;
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -66,7 +66,7 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         holder.contactNameTextView.setText(contactInfo);
         holder.contactImageView.setImageURI(Uri.parse(imageUri));
 
-        holder.contactNameTextView.setOnClickListener(new View.OnClickListener(){
+        holder.contactNameTextView.setOnClickListener(new OnClickListener(){
             @Override
             public void onClick(View view){
                 if(switcher == 1)
