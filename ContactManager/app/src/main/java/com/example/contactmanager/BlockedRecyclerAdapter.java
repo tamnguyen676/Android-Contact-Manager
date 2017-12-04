@@ -12,6 +12,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+/**
+ * Adapter for the Blocked RecyclerView
+ */
 public class BlockedRecyclerAdapter extends RecyclerView.Adapter<BlockedRecyclerAdapter.BlockedContactViewHolder>{
     private int mNumItems;
     private ArrayList<Contact> contactList;
