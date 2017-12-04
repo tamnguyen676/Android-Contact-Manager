@@ -69,7 +69,6 @@ public class Contact implements Comparable<Contact>, Serializable{
         return name.compareTo(contact.getName());
     }
 
-
     @Override
     public boolean equals(Object o){
         Contact other = (Contact)o;

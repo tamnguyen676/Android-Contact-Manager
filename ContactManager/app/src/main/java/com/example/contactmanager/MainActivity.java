@@ -311,7 +311,6 @@ public class MainActivity extends AppCompatActivity {
      * @return A Contact object that can be stored in the ArrayList.
      */
     public static Contact entityToContact(ContactEntity entity){
-        //Todo fix case where there is no group/image
         Contact contact = new Contact(entity.getName(),entity.getPhone(),entity.getEmail(),
                 entity.getAddress(),entity.getGroup(),entity.getImage(),entity.getId());
 

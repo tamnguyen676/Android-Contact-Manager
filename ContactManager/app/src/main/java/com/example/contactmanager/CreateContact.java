@@ -255,8 +255,7 @@ public class CreateContact extends AppCompatActivity {
             Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
             MainActivity.contacts.remove(oldContact);
             ((ContactManagerApplication)getApplication()).mainActivity.updateContacts();
-            MainActivity.db.dao().deleteContact(CreateContact.contactToEntity(newContact)); //Todo try oldContact
-            //Todo update database
+            MainActivity.db.dao().deleteContact(CreateContact.contactToEntity(oldContact));
             if(!oldContact.getGroup().isEmpty()){ //If they belonged to a group, remove them from it
                 try{
                     Group oldGroup = MainActivity.groups.get(existingGroup(oldContact.getGroup()));
@@ -366,7 +365,6 @@ public class CreateContact extends AppCompatActivity {
         if(oldData != null){ //If there is an old version of the contact, delete it first
             Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
             MainActivity.contacts.remove(oldContact);
-            //Todo update database
             if(!oldContact.getGroup().isEmpty()){ //If they belonged to a group, remove them from it
                 try{
                     Group oldGroup = MainActivity.groups.get(existingGroup(oldContact.getGroup()));

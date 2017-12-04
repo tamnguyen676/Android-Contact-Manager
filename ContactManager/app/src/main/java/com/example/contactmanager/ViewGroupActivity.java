@@ -70,7 +70,6 @@ public class ViewGroupActivity extends AppCompatActivity {
 
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            //Todo Fix bug that causes sort do display "Name"  before "abc" due to uppercase letters
             updateContacts();
         }
         public void updateContacts()
