@@ -25,7 +25,7 @@ public class ViewContact extends AppCompatActivity {
 
     TextView nameTxt, label1, label2, label3, label4, field1, field2, field3, field4;
     ImageButton buttonText, buttonMail, buttonCall, buttonMap;
-    String phone, email, address, group;
+    String phone, email, address, group, imageUri;
     int id;
     ImageView imgProfilePic;
     int numberOfLabelsNeeded;   //This keeps track of how many labels we need.
@@ -141,7 +141,8 @@ public class ViewContact extends AppCompatActivity {
         address = contact.getAddress();
         group = contact.getGroup();
         id = contact.getId();
-        imgProfilePic.setImageURI(Uri.parse(contact.getImageUri()));
+        imageUri = contact.getImageUri();
+        imgProfilePic.setImageURI(Uri.parse(imageUri));
 
         Log.i("Database","ID #" + Integer.toString(id));
 
@@ -246,8 +247,9 @@ public class ViewContact extends AppCompatActivity {
     private void deleteContact(){
         Toast.makeText(ViewContact.this, "Removed " + contact.getName() + " from contacts", Toast.LENGTH_SHORT).show();
         MainActivity.contacts.remove(contact);
+        Contact.setTotalContacts(Contact.getTotalContacts() - 1);
         ((ContactManagerApplication)getApplication()).mainActivity.updateContacts();
-        //Todo delete from database
+        MainActivity.db.dao().deleteContact(CreateContact.contactToEntity(contact));
         this.finish();
     }
 }

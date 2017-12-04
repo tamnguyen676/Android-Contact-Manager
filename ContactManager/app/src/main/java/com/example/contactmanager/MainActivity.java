@@ -102,10 +102,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //context.deleteDatabase("contact-database");
         db = Room.databaseBuilder(getApplicationContext(),
-                ContactDatabase.class, "contact-database").allowMainThreadQueries().build();
-       // context.deleteDatabase("contact-database");
+                ContactDatabase.class, "contacts-database").allowMainThreadQueries().build();
+        deleteAllContacts();
         fillListWithDatabase();
+        Contact.setTotalContacts(contacts.size());
         updateContacts();
     }
 
@@ -149,11 +151,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public Contact entityToContact(ContactEntity entity){
+    public static Contact entityToContact(ContactEntity entity){
         //Todo fix case where there is no group/image
-        Contact contact = new Contact(entity.getId(), entity.getName(),entity.getPhone(),entity.getEmail(), entity.getAddress(),entity.getImage(),entity.getGroup());
+        Contact contact = new Contact(entity.getName(),entity.getPhone(),entity.getEmail(),
+                entity.getAddress(),entity.getGroup(),entity.getImage(),entity.getId());
 
         return contact;
+    }
+
+    public void deleteAllContacts(){
+        ContactEntity[] contactEntities = db.dao().loadAllContacts();
+        for (int i = 0; i < contactEntities.length; i++){
+            db.dao().deleteContact(contactEntities[i]);
+        }
     }
 
     public int existingGroup(String a)  //Checks List of groups to see that group has been created
