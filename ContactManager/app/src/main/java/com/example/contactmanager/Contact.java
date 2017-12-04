@@ -9,8 +9,8 @@ import java.io.Serializable;
 public class Contact implements Comparable<Contact>, Serializable{
 
     private String name, phone, email, address, group, imageUri;
-    private static int totalContacts;
-    private int id;
+    private static int totalContacts;   //Running counter that counts how many contacts there are total
+    private int id; //Unique id of the contact for database
 
     public Contact(String name, String phone, String email, String address, String imageUri) {
         this.name = name;

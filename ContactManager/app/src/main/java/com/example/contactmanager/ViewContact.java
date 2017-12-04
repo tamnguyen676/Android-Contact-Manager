@@ -26,9 +26,8 @@ public class ViewContact extends AppCompatActivity {
     TextView nameTxt, label1, label2, label3, label4, field1, field2, field3, field4;
     ImageButton buttonText, buttonMail, buttonCall, buttonMap;
     String phone, email, address, group, imageUri;
-    int id;
     ImageView imgProfilePic;
-    int numberOfLabelsNeeded;   //This keeps track of how many labels we need.
+    int numberOfLabelsNeeded,id;   //This keeps track of how many labels we need.
     Contact contact;
 
 
@@ -49,6 +48,49 @@ public class ViewContact extends AppCompatActivity {
         field3 = (TextView) findViewById(R.id.field3);
         field4 = (TextView) findViewById(R.id.field4);
 
+        setupButtons();
+
+        final Button buttonEdit = (Button) findViewById(R.id.btnEdit);
+        final Button buttonDelete = (Button) findViewById(R.id.btnDelete);
+
+        Bundle extras = this.getIntent().getExtras();
+
+        if (extras != null){    //If creating new contact and not editing
+            contact = (Contact)extras.getSerializable("CONTACT");
+            updateFields();
+
+            buttonEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent editContactIntent = new Intent(ViewContact.this, CreateContact.class );
+                    editContactIntent.putExtra("CONTACT", contact);
+                    startActivityForResult(editContactIntent, 1);
+                }
+            });
+
+            buttonDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new AlertDialog.Builder(ViewContact.this)
+                            .setTitle("Remove Contact")
+                            .setMessage("Are you sure that you want to remove " + contact.getName() + " from your contacts?")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    deleteContact();
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, null)
+                            .show();
+                }
+            });
+        }
+        else
+            this.finish();
+    }
+
+    private void setupButtons() {
         buttonText = (ImageButton) findViewById(R.id.btnText);
         buttonText.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -89,50 +131,12 @@ public class ViewContact extends AppCompatActivity {
                 startActivity(mapIntent);
             }
         });
-
-        final Button buttonEdit = (Button) findViewById(R.id.btnEdit);
-        final Button buttonDelete = (Button) findViewById(R.id.btnDelete);
-
-        Bundle extras = this.getIntent().getExtras();
-
-        if (extras != null){
-            contact = (Contact)extras.getSerializable("CONTACT");
-
-            updateFields();
-
-            buttonEdit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent editContactIntent = new Intent(ViewContact.this, CreateContact.class );
-                    editContactIntent.putExtra("CONTACT", contact);
-                    startActivityForResult(editContactIntent, 1);
-                }
-            });
-
-            buttonDelete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    new AlertDialog.Builder(ViewContact.this)
-                            .setTitle("Remove Contact")
-                            .setMessage("Are you sure that you want to remove " + contact.getName() + " from your contacts?")
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    deleteContact();
-                                }
-                            })
-                            .setNegativeButton(android.R.string.no, null)
-                            .show();
-                }
-            });
-        }
-        else
-            this.finish();
     }
 
-
-
+    /**
+     * Displays only the fields for which there are values for. Gets all
+     * values from the Contact object and displays it accordingly on the page.
+     */
     private void updateFields() {
         numberOfLabelsNeeded = 0;
         nameTxt.setText(contact.getName());
@@ -144,7 +148,7 @@ public class ViewContact extends AppCompatActivity {
         imageUri = contact.getImageUri();
         imgProfilePic.setImageURI(Uri.parse(imageUri));
 
-        Log.i("Database","ID #" + Integer.toString(id));
+        Log.i("Database","ID #" + Integer.toString(id));    //Show contact ID in log
 
         //If not empty, then set the next available label to say "Phone" and display phone number beneath
         if (phone.compareTo("") != 0){
@@ -170,6 +174,15 @@ public class ViewContact extends AppCompatActivity {
 
         hideExtraLabels();  //Makes the labels we don't use invisible.
 
+        enableButtons();    //Enable the buttons only if the proper data field is available
+    }
+
+    /**
+     * Allows the user to click the buttons only if the proper
+     * data fields are available to do so. For example, users
+     * can only click email if there is an email associated.
+     */
+    private void enableButtons() {
         if(phone.equals("")){
             buttonCall.setEnabled(false);
             buttonText.setEnabled(false);
@@ -194,12 +207,23 @@ public class ViewContact extends AppCompatActivity {
         }
     }
 
+    /**
+     * Sets what type of data the label should display, then displays
+     * that data underneath in the field.
+     * @param label The type data to be displayed (Phone, Group, etc...)
+     * @param info The value of the data field itself
+     */
     private void setText(String label,String info){
         getLabel(numberOfLabelsNeeded).setText(label);
         getField(numberOfLabelsNeeded).setText(info);
     }
 
-    //Returns the next available label based on how many have been used
+    /**
+     * Finds and returns a reference to the label
+     * matching the integer passed into it.
+     * @param labelNum Which number label is wanted
+     * @return A TextView reference to that label
+     */
     private TextView getLabel(int labelNum){
         switch (labelNum){
             case 1: return label1;
@@ -210,7 +234,12 @@ public class ViewContact extends AppCompatActivity {
         return null;
     }
 
-    //Returns the next available field depending on how many have been used
+    /**
+     * Finds and returns a reference to the text field
+     * matching the integer passed into it.
+     * @param fieldNum Which number field is wanted
+     * @return A TextView reference to that field
+     */
     private TextView getField(int fieldNum){
         switch (fieldNum){
             case 1: return field1;
@@ -222,7 +251,10 @@ public class ViewContact extends AppCompatActivity {
         return null;
     }
 
-    //Hides extra labels that are not used
+    /**
+     * Given the number of labels used, makes all of the
+     * labels that are not used invisible.
+     */
     private void hideExtraLabels() {  //NOTE: This relies on the fall through of the switch statement
         switch (numberOfLabelsNeeded) {
             case 0:
@@ -244,6 +276,10 @@ public class ViewContact extends AppCompatActivity {
         updateFields();
     }
 
+    /**
+     * Deletes the contact that is being displayed on the current
+     * page. Removes it from the list and the database and updates the coutner.
+     */
     private void deleteContact(){
         Toast.makeText(ViewContact.this, "Removed " + contact.getName() + " from contacts", Toast.LENGTH_SHORT).show();
         MainActivity.contacts.remove(contact);
