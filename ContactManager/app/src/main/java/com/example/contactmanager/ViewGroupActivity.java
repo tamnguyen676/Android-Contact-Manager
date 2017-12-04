@@ -79,19 +79,4 @@ public class ViewGroupActivity extends AppCompatActivity {
         contactAdapter2.updateList(contacts);
 
          }
-
-
-
-
-    //Returns the next available label based on how many have been used
-
-    /*
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        ((ContactManagerApplication)getApplication()).mainActivity.updateContacts();
-        if(data != null){
-            contact = (Contact)data.getExtras().getSerializable("CONTACT");
-        }
-
-    }
-    */
 }

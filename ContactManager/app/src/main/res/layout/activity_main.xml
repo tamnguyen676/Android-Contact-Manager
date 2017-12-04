@@ -89,6 +89,12 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/recyclerView3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center" />
+
                     <TextView
                         android:id="@+id/tab3Header"
                         android:layout_width="match_parent"

@@ -22,7 +22,7 @@ public class Contact implements Comparable<Contact>, Serializable{
         _address = address;
         _group = "";
         _imageUri = imageUri;
-        id = totalContacts++;
+        id = totalContacts++;   //Todo fix bug where id is incremented on edit
     }
 
     public Contact(String name, String phone, String email, String address, String imageUri, int contactId) {
@@ -45,7 +45,7 @@ public class Contact implements Comparable<Contact>, Serializable{
         id = totalContacts++;
     }
 
-    public Contact(String name, String phone, String email, String address, String group, String imageUri, int contactId) {
+    public Contact(int contactId, String name, String phone, String email, String address, String imageUri, String group) {
         _name = name;
         _phone = phone;
         _email = email;
@@ -106,10 +106,6 @@ public class Contact implements Comparable<Contact>, Serializable{
 
     public String getImageUri(){return _imageUri;}
     public int getId(){return id;}
-
-    public static int getTotalContacts(){
-        return totalContacts;
-    }
 
     public static void setTotalContacts(int total){
         totalContacts = total;

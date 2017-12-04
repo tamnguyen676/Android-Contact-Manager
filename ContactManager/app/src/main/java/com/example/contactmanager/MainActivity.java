@@ -26,11 +26,14 @@ public class MainActivity extends AppCompatActivity {
 
     public static Context context;
     static ArrayList<Contact> contacts = new ArrayList<Contact>();
+    static ArrayList<Contact> blockedcontacts = new ArrayList<Contact>();
     static ArrayList<Group> groups = new ArrayList<Group>();
     RecyclerView contactRecyclerView;   //Reference object to the RecyclerView
     RecyclerView groupRecyclerView;
+    RecyclerView blockedRecyclerView;
     private ContactRecyclerAdapter contactAdapter;
     private GroupRecyclerAdapter groupAdapter;
+    private ContactRecyclerAdapter blockedAdapter;
     int numberOfContacts;
     public static ContactDatabase db;
 
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         contactRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         groupRecyclerView = (RecyclerView) findViewById(R.id.recyclerView2);
+        blockedRecyclerView = (RecyclerView) findViewById(R.id.recyclerView3);
 
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
@@ -92,6 +96,12 @@ public class MainActivity extends AppCompatActivity {
         groupAdapter = new GroupRecyclerAdapter(0,this);
         groupRecyclerView.setAdapter(groupAdapter);
 
+        LinearLayoutManager layoutManager3
+                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        blockedRecyclerView.setLayoutManager(layoutManager3);
+        blockedAdapter = new ContactRecyclerAdapter(0,this);
+        blockedRecyclerView.setAdapter(blockedAdapter);
+
         final Button btnAdd = (Button) findViewById(R.id.btnAdd);
         //if add was clicked, then start new activity
         btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -102,12 +112,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //context.deleteDatabase("contact-database");
         db = Room.databaseBuilder(getApplicationContext(),
-                ContactDatabase.class, "contacts-database").allowMainThreadQueries().build();
-        deleteAllContacts();
+                ContactDatabase.class, "contact-database").allowMainThreadQueries().build();
+       // context.deleteDatabase("contact-database");
         fillListWithDatabase();
-        Contact.setTotalContacts(contacts.size());
         updateContacts();
     }
 
@@ -127,11 +135,18 @@ public class MainActivity extends AppCompatActivity {
         viewContactIntent.putExtra("GROUP", groups.get(group));
         startActivity(viewContactIntent);
     }
+    public void viewBlockedContact(int contact){
+        Intent viewContactIntent = new Intent(MainActivity.this, ViewContact.class);
+        viewContactIntent.putExtra("CONTACT", blockedcontacts.get(contact));
+        startActivity(viewContactIntent);
+    }
     public void updateContacts(){
         Collections.sort(contacts); //Sorts contacts in alphabetical order
+        Collections.sort(blockedcontacts);
         Collections.sort(groups);
         contactAdapter.updateList(contacts);
         groupAdapter.updateList(groups);
+        blockedAdapter.updateList(blockedcontacts);
     }
     public void fillListWithDatabase(){
         ContactEntity[] contactEntityList = db.dao().loadAllContacts();
@@ -151,19 +166,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static Contact entityToContact(ContactEntity entity){
+    public Contact entityToContact(ContactEntity entity){
         //Todo fix case where there is no group/image
-        Contact contact = new Contact(entity.getName(),entity.getPhone(),entity.getEmail(),
-                entity.getAddress(),entity.getGroup(),entity.getImage(),entity.getId());
+        Contact contact = new Contact(entity.getId(), entity.getName(),entity.getPhone(),entity.getEmail(), entity.getAddress(),entity.getImage(),entity.getGroup());
 
         return contact;
-    }
-
-    public void deleteAllContacts(){
-        ContactEntity[] contactEntities = db.dao().loadAllContacts();
-        for (int i = 0; i < contactEntities.length; i++){
-            db.dao().deleteContact(contactEntities[i]);
-        }
     }
 
     public int existingGroup(String a)  //Checks List of groups to see that group has been created

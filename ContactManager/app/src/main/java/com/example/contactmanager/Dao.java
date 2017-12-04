@@ -1,6 +1,5 @@
 package com.example.contactmanager;
 
-import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
@@ -19,7 +18,4 @@ public interface Dao {
 
     @Update
     public void updateContact(ContactEntity contactEntity);
-
-    @Delete
-    public void deleteContact(ContactEntity contactEntity);
 }
