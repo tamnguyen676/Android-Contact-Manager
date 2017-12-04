@@ -17,7 +17,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,63 +45,53 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ((ContactManagerApplication)getApplication()).mainActivity = this;
-        //context.deleteDatabase("contact-database");
 
         contactRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         groupRecyclerView = (RecyclerView) findViewById(R.id.recyclerView2);
 
-        TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
-        tabHost.setup();
-        TabHost.TabSpec tabSpec;
+        setupAllTabs();
 
-        //Sets up tabs
-        setUpTab(tabHost,"list",R.id.tabContactList);
-        setUpTab(tabHost,"group",R.id.tabGroupList);
-        setUpTab(tabHost,"blocked",R.id.tabBlockedList);
-
-
-        if (Build.VERSION.SDK_INT < 27) {}
-        else if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
-        {
-            if(shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)){
-                Toast.makeText(this, "Read External Storage permission is needed to select picture from device", Toast.LENGTH_SHORT).show();
-            }
-
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 13); //request permissions
-        }
-        if(checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
-        {
-            if(shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)){
-                Toast.makeText(this, "Contact permissions needed to import", Toast.LENGTH_SHORT).show();
-            }
-
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 13); //request permissions
-        }
+        checkPermissions();
 
         final Button btnImport = (Button) findViewById(R.id.btnImport);
         final ArrayList<Contact> importedContacts = new ArrayList<Contact>();
 
-
         btnImport.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                loadContacts(importedContacts);
-                Collections.sort(importedContacts);
-
-                for(int i = importedContacts.size() - 1; i >= 0; i--){
-                    if(contacts.contains(importedContacts.get(i)))
-                        importedContacts.remove(i);
-                }
-                if(importedContacts.size() == 0)
-                    Toast.makeText(MainActivity.this, "Contacts are up to date", Toast.LENGTH_LONG).show();
-                else{
-                    Intent importContacts = new Intent(MainActivity.this, CreateContact.class);
-                    importContacts.putExtra("IMPORT_LIST", importedContacts);
-                    startActivityForResult(importContacts, 1);
-                }
+                importContacts(importedContacts);
             }
         });
 
+        setupRecyclerViews();
+
+        final Button btnAdd = (Button) findViewById(R.id.btnAdd);
+        //if add was clicked, then start new activity
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            Intent createContactIntent = new Intent(MainActivity.this, CreateContact.class );
+            startActivityForResult(createContactIntent, 1);
+            }
+        });
+
+        //SQLite database that stores all contacts
+        db = Room.databaseBuilder(getApplicationContext(),
+                ContactDatabase.class, "contacts-database").allowMainThreadQueries().build();
+
+        //Used for debugging purposes. Uncomment to start app with fresh database.
+        //deleteAllContacts();
+
+        fillListWithDatabase();
+        Contact.setTotalContacts(contacts.size());
+        updateContacts();
+    }   //End onCreate()
+
+    /**
+     * Sets up the ReyclerViews for the contacts and the groups. ReyclerViews allows for smooth scrolling
+     * even with large amounts of items. This method is called via once in onCreate() in MainActivity.
+     */
+    private void setupRecyclerViews() {
         //Gets RecyclerView ready for contact list
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -116,27 +105,54 @@ public class MainActivity extends AppCompatActivity {
         groupRecyclerView.setLayoutManager(layoutManager2);
         groupAdapter = new GroupRecyclerAdapter(0,this);
         groupRecyclerView.setAdapter(groupAdapter);
-
-        final Button btnAdd = (Button) findViewById(R.id.btnAdd);
-        //if add was clicked, then start new activity
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            Intent createContactIntent = new Intent(MainActivity.this, CreateContact.class );
-            startActivityForResult(createContactIntent, 1);
-            }
-        });
-
-        //context.deleteDatabase("contact-database");
-        db = Room.databaseBuilder(getApplicationContext(),
-                ContactDatabase.class, "contacts-database").allowMainThreadQueries().build();
-        //deleteAllContacts();
-        fillListWithDatabase();
-        Contact.setTotalContacts(contacts.size());
-        updateContacts();
     }
 
-    private void setUpTab(TabHost tabHost,String tag,int tabId) {
+    /**
+     * Checks permissions and asks the user for storage and contact access.
+     */
+    private void checkPermissions() {
+        if (Build.VERSION.SDK_INT < 27) {}
+        else if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
+        {
+            if(shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)){
+                Toast.makeText(this, "Read External Storage permission is needed to select picture from device", Toast.LENGTH_SHORT).show();
+            }
+
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 13); //request permissions
+        }
+
+        if(checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) //check if read storage permission is set
+        {
+            if(shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)){
+                Toast.makeText(this, "Contact permissions needed to import", Toast.LENGTH_SHORT).show();
+            }
+
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 13); //request permissions
+        }
+    }
+
+    /**
+     * Sets up all the tabs in the MainActivity page
+     */
+    private void setupAllTabs() {
+        TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
+        tabHost.setup();
+        TabHost.TabSpec tabSpec;
+
+        //Sets up tabs
+        setupTab(tabHost,"list",R.id.tabContactList);
+        setupTab(tabHost,"group",R.id.tabGroupList);
+        setupTab(tabHost,"blocked",R.id.tabBlockedList);
+    }
+
+    /**
+     * Sets up individual tabs for the MainActivity page. Called via onCreate() at launch.
+     *
+     * @param tabHost The tabHost reference object created in the MainActivity
+     * @param tag The tag and name of the tab to be set up
+     * @param tabId The ID value of the tab from the XML layout
+     */
+    private void setupTab(TabHost tabHost, String tag, int tabId) {
         TabHost.TabSpec tabSpec;
         tabSpec =  tabHost.newTabSpec(tag);
         tabSpec.setContent(tabId);
@@ -170,16 +186,34 @@ public class MainActivity extends AppCompatActivity {
                     cursor2.close();
                 }
             }while(cursor.moveToNext());
-
-
         }
         cursor.close();
     }
 
-    //after returning from activity update list view
+    //After returning from activity update list view
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //Todo Fix bug that causes sort do display "Name"  before "abc" due to uppercase letters
         updateContacts();
+    }
+
+    /**
+     * Imports contacts
+     * @param importedContacts An ArrayList that contains imported contacts
+     */
+    private void importContacts(ArrayList<Contact> importedContacts) {
+        loadContacts(importedContacts);
+        Collections.sort(importedContacts);
+
+        for(int i = importedContacts.size() - 1; i >= 0; i--){
+            if(contacts.contains(importedContacts.get(i)))
+                importedContacts.remove(i);
+        }
+        if(importedContacts.size() == 0)
+            Toast.makeText(MainActivity.this, "Contacts are up to date", Toast.LENGTH_LONG).show();
+        else{
+            Intent importContacts = new Intent(MainActivity.this, CreateContact.class);
+            importContacts.putExtra("IMPORT_LIST", importedContacts);
+            startActivityForResult(importContacts, 1);
+        }
     }
 
     public void viewContact(int contact){
@@ -187,17 +221,29 @@ public class MainActivity extends AppCompatActivity {
         viewContactIntent.putExtra("CONTACT", contacts.get(contact));
         startActivity(viewContactIntent);
     }
+
     public void viewGroup(int group){
         Intent viewContactIntent = new Intent(MainActivity.this, ViewGroupActivity.class);
         viewContactIntent.putExtra("GROUP", groups.get(group));
         startActivity(viewContactIntent);
     }
+
+    /**
+     * Updates the main page with newly added or edited contacts and groups by
+     * sending the updated list to the adapter. Sorts in alphabetical order
+     * before displaying.
+     */
     public void updateContacts(){
         Collections.sort(contacts); //Sorts contacts in alphabetical order
         Collections.sort(groups);
         contactAdapter.updateList(contacts);
         groupAdapter.updateList(groups);
     }
+
+    /**
+     * Accesses the SQLite database and fills the contacts ArrayList with all users from
+     * from the database.
+     */
     public void fillListWithDatabase(){
         ContactEntity[] contactEntityList = db.dao().loadAllContacts();
         for (int i = 0; i < contactEntityList.length; i++){
@@ -216,6 +262,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Converts a ContactEntity object used by the database to a Contact object used
+     * by the rest of the program. All fields of the ContactEntity object is transferred
+     * over to the Contact object.
+     * @param entity A ContactEntity object that the SQLite database uses.
+     * @return A Contact object that can be stored in the ArrayList.
+     */
     public static Contact entityToContact(ContactEntity entity){
         //Todo fix case where there is no group/image
         Contact contact = new Contact(entity.getName(),entity.getPhone(),entity.getEmail(),
@@ -224,6 +277,9 @@ public class MainActivity extends AppCompatActivity {
         return contact;
     }
 
+    /**
+     * Deletes all entries from the SQLite database. Useful for debugging.
+     */
     public void deleteAllContacts(){
         ContactEntity[] contactEntities = db.dao().loadAllContacts();
         for (int i = 0; i < contactEntities.length; i++){
@@ -231,11 +287,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public int existingGroup(String a)  //Checks List of groups to see that group has been created
+    /**
+     * Finds the index of a group in the ArrayList given the name.
+     *
+     * @param groupName The name of the group to be found
+     * @return The index of the group in the ArrayList, or -1 if the group was not found.
+     */
+    public int existingGroup(String groupName)
     {
         int x = 0;
         while (x < groups.size()) {
-            if (a.equals(groups.get(x).getGroupName()))
+            if (groupName.equals(groups.get(x).getGroupName()))
                 return x;
             x++;
         }
