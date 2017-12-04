@@ -184,6 +184,10 @@ public class CreateContact extends AppCompatActivity {
         if(resultCode == RESULT_OK);
             if(requestCode == PROFILE_PICTURE_EDIT){ //return from gallery
 
+                if (data == null){
+                    return;
+                }
+
                 //address of the image
                 if (data.getData() != null) {
                     imageUri = data.getData();

@@ -11,10 +11,7 @@ public class Contact implements Comparable<Contact>, Serializable{
     private String name, phone, email, address, group, imageUri;
     private static int totalContacts;   //Running counter that counts how many contacts there are total
     private int id; //Unique id of the contact for database
-<<<<<<< HEAD
 
-=======
->>>>>>> 3aef34d6e2c936560f6493dd8bb8f0de2e4b7570
 
     public Contact(String name, String phone, String email, String address, String imageUri) {
         this.name = name;
