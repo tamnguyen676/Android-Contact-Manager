@@ -60,7 +60,6 @@ public class CreateContact extends AppCompatActivity {
 
 
         ArrayList<Contact> importList = (ArrayList<Contact>) getIntent().getSerializableExtra("IMPORT_LIST");
-        oldData = this.getIntent().getExtras();
 
         if(importList != null){
             for(int i = 0; i < importList.size(); i++){
@@ -87,6 +86,8 @@ public class CreateContact extends AppCompatActivity {
 
             }
         }
+
+        oldData = this.getIntent().getExtras();
 
         final Button btnSaveContact = (Button) findViewById(R.id.btnSaveContact);
         final Button btnBlockContact = (Button) findViewById(R.id.btnBlockContact);
