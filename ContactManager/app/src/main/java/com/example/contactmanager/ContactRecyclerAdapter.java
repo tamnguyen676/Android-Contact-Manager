@@ -13,6 +13,9 @@ import android.view.View.OnClickListener;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * RecyclerView class to efficiently display contacts in a list.
+ */
 public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecyclerAdapter.ContactViewHolder>{
     private int mNumItems;
     private ArrayList<Contact> contactList;
@@ -90,6 +93,4 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         contactList = list;
         notifyDataSetChanged();
     }
-
-
 }

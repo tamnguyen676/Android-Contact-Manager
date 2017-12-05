@@ -1,8 +1,6 @@
 package com.example.contactmanager;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -23,7 +21,9 @@ import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
+/**
+ * Page launched when user wants to create or edit a contact.
+ */
 public class CreateContact extends AppCompatActivity {
 
 
@@ -58,34 +58,7 @@ public class CreateContact extends AppCompatActivity {
         }
         factory.addFileOpenListener(imgSetProfilePic, CreateContact.this);
 
-
-        ArrayList<Contact> importList = (ArrayList<Contact>) getIntent().getSerializableExtra("IMPORT_LIST");
-
-        if(importList != null){
-            for(int i = 0; i < importList.size(); i++){
-                nameTxt.setText(importList.get(i).getName());
-                phoneTxt.setText(importList.get(i).getPhone());
-                emailTxt.setText(importList.get(i).getEmail());
-                addressTxt.setText(importList.get(i).getAddress());
-                groupTxt.setText(importList.get(i).getGroup());
-                imageUri = Uri.parse(importList.get(i).getImageUri());
-                try {
-                    imgSetProfilePic.setImageBitmap(uriToBitmap(imageUri)); //--------------------------
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                if(imageUri == null || imageUri.toString().isEmpty())
-                    imageUri = Uri.parse("android.resource://com.example.contactmanager/drawable/no_photo");
-                Contact newContact = new Contact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString(),groupTxt.getText().toString(), imageUri.toString());
-                updateContact(oldData, newContact);
-                Intent data = new Intent();
-                data.putExtra("CONTACT",newContact);
-                setResult(RESULT_OK, data);
-                finish();
-
-            }
-        }
+        getImportedContacts();
 
         oldData = this.getIntent().getExtras();
 
@@ -93,63 +66,25 @@ public class CreateContact extends AppCompatActivity {
         final Button btnBlockContact = (Button) findViewById(R.id.btnBlockContact);
 
         if (oldData != null){
-            Contact currentContact = (Contact)oldData.getSerializable("CONTACT");
-            if(currentContact != null){
-                nameTxt.setText(currentContact.getName());
-                phoneTxt.setText(currentContact.getPhone());
-                emailTxt.setText(currentContact.getEmail());
-                addressTxt.setText(currentContact.getAddress());
-                groupTxt.setText(currentContact.getGroup());
-                imageUri = Uri.parse(currentContact.getImageUri());
-                id = currentContact.getId();
-                try {
-                    imgSetProfilePic.setImageBitmap(uriToBitmap(imageUri)); //--------------------------
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                if (MainActivity.blockedcontacts.contains(currentContact)){
-                    btnBlockContact.setText("Unblock Contact");
-                    blockedContact = true;
-                }
-                else {
-                    btnBlockContact.setText("Block Contact");
-                    blockedContact = false;
-                }
-
-                btnSaveContact.setEnabled(true);
-                btnBlockContact.setEnabled(true);
-            }
+            setBlockedOrUnblocked(btnSaveContact, btnBlockContact); //Changes functionality of block button
         }
 
         btnBlockContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Contact newContact = null;
-                newContact = new Contact(nameTxt.getText().toString(),
+                Contact newContact = new Contact(nameTxt.getText().toString(),
                         phoneTxt.getText().toString(), emailTxt.getText().toString(),
                         addressTxt.getText().toString(), groupTxt.getText().toString(),
                         imageUri.toString(), id);
 
                 if (blockedContact == false) {   //Blocking contact
                     updateBlockedContact(oldData, newContact);
-                    Intent data = new Intent();
-                    data.putExtra("CONTACT", newContact);
-                    setResult(RESULT_OK, data);
-                    finish();
-                    Toast.makeText(getApplicationContext(),
-                            nameTxt.getText().toString() + " has been Blocked!",
-                            Toast.LENGTH_SHORT).show();
+                    displayBlockOrUnblock(true,newContact);
                 }
+
                 else {
                     unblockContact(oldData,newContact);
-                    Intent data = new Intent();
-                    data.putExtra("CONTACT", newContact);
-                    setResult(RESULT_OK, data);
-                    finish();
-                    Toast.makeText(getApplicationContext(),
-                            nameTxt.getText().toString() + " has been unblocked!",
-                            Toast.LENGTH_SHORT).show();
+                    displayBlockOrUnblock(false,newContact);
                 }
             }
         });
@@ -175,10 +110,7 @@ public class CreateContact extends AppCompatActivity {
                         imageUri.toString(),id);
             }
             updateContact(oldData, newContact);
-            Intent data = new Intent();
-            data.putExtra("CONTACT",newContact);
-            setResult(RESULT_OK, data);
-            finish();
+            putExtraContact(newContact);
             Toast.makeText(getApplicationContext(), nameTxt.getText().toString()+" has been saved to your contacts!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -196,36 +128,76 @@ public class CreateContact extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-
             }
         });
     }
 
-    //When returning from an open image activity, get the image to use for the contact
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        if(resultCode == RESULT_OK);
-            if(requestCode == PROFILE_PICTURE_EDIT){ //return from gallery
-
-                if (data == null){
-                    return;
-                }
-
-                //address of the image
-                if (data.getData() != null) {
-                    imageUri = data.getData();
-                }
-                else {
-                    imageUri = Uri.parse("android.resource://com.example.contactmanager/drawable/no_photo");
-                }
-
-                try {
-                    imgSetProfilePic.setImageBitmap(uriToBitmap(imageUri));
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+    /**
+     * Looks at a contact and determines if they are blocked or unblocked.
+     * It then sets the appropriate flags and changes the text of the button
+     * to prepare for the right functionality when the button is block/unblock
+     * is pressed.
+     * @param btnSaveContact The reference to the button that saves contacts
+     * @param btnBlockContact The reference to the button that can block/unblock contacts
+     */
+    private void setBlockedOrUnblocked(Button btnSaveContact, Button btnBlockContact) {
+        Contact currentContact = (Contact)oldData.getSerializable("CONTACT");
+        if(currentContact != null){
+            fillExistingContactInfo(currentContact);
+            if (MainActivity.blockedcontacts.contains(currentContact)){
+                btnBlockContact.setText("Unblock Contact");
+                blockedContact = true;
             }
+            else {
+                btnBlockContact.setText("Block Contact");
+                blockedContact = false;
+            }
+
+            btnSaveContact.setEnabled(true);
+            btnBlockContact.setEnabled(true);
+        }
+    }
+
+    /**
+     * Fills the Create Contact page with info from a contact if
+     * it already exists
+     * @param currentContact The contact object to be displayed
+     */
+    private void fillExistingContactInfo(Contact currentContact) {
+        nameTxt.setText(currentContact.getName());
+        phoneTxt.setText(currentContact.getPhone());
+        emailTxt.setText(currentContact.getEmail());
+        addressTxt.setText(currentContact.getAddress());
+        groupTxt.setText(currentContact.getGroup());
+        imageUri = Uri.parse(currentContact.getImageUri());
+        id = currentContact.getId();
+        try {
+            imgSetProfilePic.setImageBitmap(uriToBitmap(imageUri)); //--------------------------
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Gets a list of all contacts to be imported then imports them
+     * into the Contact Manager. Imports to the ArrayList and to the Database.
+     */
+    private void getImportedContacts() {
+        ArrayList<Contact> importList = (ArrayList<Contact>) getIntent().getSerializableExtra("IMPORT_LIST");
+
+        if(importList != null){
+            Contact newContact;
+            for(int i = 0; i < importList.size(); i++){
+                newContact = importList.get(i);
+                fillExistingContactInfo(newContact);
+
+                if(imageUri == null || imageUri.toString().isEmpty())
+                    imageUri = Uri.parse("android.resource://com.example.contactmanager/drawable/no_photo");
+                newContact = new Contact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString(),groupTxt.getText().toString(), imageUri.toString());
+                updateContact(oldData, newContact);
+                putExtraContact(newContact);
+            }
+        }
     }
 
     /**
@@ -344,13 +316,17 @@ public class CreateContact extends AppCompatActivity {
     }
 
     /**
-     * Adds the contact to the database
-     *
-     * @param newContact the new contact to be added
+     * Adds the contact to the contacts database
+     * @param newContact The new contact to be added
      */
     private void addContactToDatabase(Contact newContact){
         MainActivity.db.dao().insertContact(contactToEntity(newContact));
     }
+
+    /**
+     * Adds the contact to the blocked database
+     * @param newContact The contact to be blocked
+     */
     private void addBlockedContactToDatabase(Contact newContact){
         MainActivity.db2.dao().insertContact(contactToEntity(newContact));
     }
@@ -386,6 +362,17 @@ public class CreateContact extends AppCompatActivity {
     }
 
     /**
+     * Sends a reference to a contact via intents and sets result.
+     * @param contact Contact object to be sent
+     */
+    private void putExtraContact(Contact contact){
+        Intent data = new Intent();
+        data.putExtra("CONTACT",contact);
+        setResult(RESULT_OK, data);
+        finish();
+    }
+
+    /**
      * Returns the index of the requested group, if it exists.
      *
      * @param groupName the name of the group to look for
@@ -403,6 +390,51 @@ public class CreateContact extends AppCompatActivity {
             }
 
         throw new NonexistentGroupException(groupName);
+    }
+
+    /**
+     * Sets result of the intent and displays a toast message depending on whethr or not
+     * a contact is to be blocked or unblocked.
+     * @param isBlocked True if contact is to blocked, false if contact is to be unblocked
+     * @param newContact The Contact object of the contact to be blocked/unblocked
+     */
+    private void displayBlockOrUnblock(boolean isBlocked,Contact newContact){
+        putExtraContact(newContact);
+
+        String message = " has been blocked";
+        if (!isBlocked){
+            message = " has been unblocked";
+        }
+
+        Toast.makeText(getApplicationContext(),
+                nameTxt.getText().toString() + message,
+                Toast.LENGTH_SHORT).show();
+    }
+
+    //When returning from an open image activity, get the image to use for the contact
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(resultCode == RESULT_OK);
+        if(requestCode == PROFILE_PICTURE_EDIT){ //return from gallery
+
+            if (data == null){
+                return;
+            }
+
+            //address of the image
+            if (data.getData() != null) {
+                imageUri = data.getData();
+            }
+            else {
+                imageUri = Uri.parse("android.resource://com.example.contactmanager/drawable/no_photo");
+            }
+
+            try {
+                imgSetProfilePic.setImageBitmap(uriToBitmap(imageUri));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public class NonexistentGroupException extends Exception{

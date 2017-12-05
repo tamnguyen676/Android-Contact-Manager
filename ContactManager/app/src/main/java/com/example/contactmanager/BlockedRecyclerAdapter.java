@@ -25,6 +25,9 @@ public class BlockedRecyclerAdapter extends RecyclerView.Adapter<BlockedRecycler
         this.mainActivity = mainActivity;
     }
 
+    /**
+     * Viewholder object for each blocked contact to display
+     */
     public class BlockedContactViewHolder extends RecyclerView.ViewHolder{
         public final TextView contactNameTextView;
         public final ImageView contactImageView;
@@ -36,6 +39,7 @@ public class BlockedRecyclerAdapter extends RecyclerView.Adapter<BlockedRecycler
             contactImageView = (ImageView) itemView.findViewById(R.id.imgListProfilePicture);
         }
     }
+
 
     @Override
     public BlockedContactViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
