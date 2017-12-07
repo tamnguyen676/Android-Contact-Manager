@@ -3,7 +3,8 @@ package com.example.contactmanager;
 import java.io.Serializable;
 
 /**
- * Created by Artem on 10/21/17.
+ * Contact class that stores all info about an individual contact,
+ * including name, phone number, email, address, group, and image path.
  */
 
 public class Contact implements Comparable<Contact>, Serializable{
@@ -11,6 +12,8 @@ public class Contact implements Comparable<Contact>, Serializable{
     private String name, phone, email, address, group, imageUri;
     private static int totalContacts;   //Running counter that counts how many contacts there are total
     private int id; //Unique id of the contact for database
+
+    public Contact(){}
 
     /**
      * Constructor for when a new contact is created from scratch.
@@ -67,7 +70,6 @@ public class Contact implements Comparable<Contact>, Serializable{
         return name.compareTo(contact.getName());
     }
 
-
     @Override
     public boolean equals(Object o){
         Contact other = (Contact)o;
@@ -106,9 +108,13 @@ public class Contact implements Comparable<Contact>, Serializable{
     public String getGroup() { return group; }
     public String getImageUri(){return imageUri;}
     public int getId(){return id;}
+    public void setImageUri(String imageUri){
+        this.imageUri = imageUri;
+    }
     public static int getTotalContacts(){
         return totalContacts;
     }
+
 
     /**
      * Sets the total number of contacts so that the

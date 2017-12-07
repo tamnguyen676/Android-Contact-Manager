@@ -1,43 +1,62 @@
 package com.example.contactmanager;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.io.Serializable;
 
 /**
- * Created by Artem on 10/21/17.
+ * Group class that holds the name of the group, the size, and a list of contacts
+ * in the group.
  */
 
 public class Group implements Comparable <Group>, Serializable{
-    ArrayList<Contact> Contacts;
-    private String _name;
+    ArrayList<Contact> contacts;    //Holds list of contacts for a group
+    private String name;    //Name of the group
     public int size;
 
-    public Group(String name,Contact a) {
-        _name = name;
+
+    public Group(String name,Contact contact) {
+        this.name = name;
         size = 0;
-        Contacts = new ArrayList<Contact>();
-        addContact(a);
-
-
+        contacts = new ArrayList<Contact>();
+        addContact(contact);
     }
+
+    /**
+     * Used by the Collections class to sort.
+     * @param group Compares the group name of the object invoking to the group name of
+     *              the group object parameter.
+     * @return 1 if the first group string is lexicographically greater than the
+     * second string else the result would be -1. 0 if equal.
+     */
     @Override
     public int compareTo(Group group) {
-        return _name.compareTo(group.getGroupName());
+        return name.compareTo(group.getGroupName());
     }
 
+    /**
+     * Returns group name.
+     * @return
+     */
     public String getGroupName(){
-        return _name;
+        return name;
     }
 
-    public void addContact(Contact a) {
-        Contacts.add(new Contact(a.getName(), a.getPhone(), a.getEmail(), a.getAddress(), a.getGroup(), a.getImageUri()));
+    /**
+     * Adds a contact to the group
+     * @param contact Contact object to be added to the group
+     */
+    public void addContact(Contact contact) {
+        contacts.add(new Contact(contact.getName(), contact.getPhone(), contact.getEmail(), contact.getAddress(), contact.getGroup(), contact.getImageUri()));
         size++;
     }
 
+    /**
+     * Removes a contact from the group
+     * @param toRemove Contact object to be removed from the group
+     */
     public void removeContact(Contact toRemove){
-        if(Contacts.contains(toRemove)){
-            Contacts.remove(toRemove);
+        if(contacts.contains(toRemove)){
+            contacts.remove(toRemove);
             size--;
         }
     }

@@ -54,9 +54,10 @@ public class MainActivity extends AppCompatActivity {
         contactRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         groupRecyclerView = (RecyclerView) findViewById(R.id.recyclerView2);
         blockedRecyclerView = (RecyclerView) findViewById(R.id.recyclerView3);
-        setupAllTabs();
 
-        checkPermissions();
+        setupAllTabs(); //Sets up all the tabs to be displayed and clikable
+
+        checkPermissions(); //Looks and asks for storage and contact permissions
 
         final Button btnImport = (Button) findViewById(R.id.btnImport);
         final ArrayList<Contact> importedContacts = new ArrayList<Contact>();
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("Import Contacts")
+                        .setTitle("Import contacts")
                         .setMessage("Would you like to import existing contacts from the default contact app?")
                         .setIcon(android.R.drawable.ic_menu_save)
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -76,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
                         })
                         .setNegativeButton(android.R.string.no, null)
                         .show();
-
             }
         });
 
@@ -97,12 +97,16 @@ public class MainActivity extends AppCompatActivity {
                 ContactDatabase.class, "contacts-database").allowMainThreadQueries().build();
         db2 = Room.databaseBuilder(getApplicationContext(),
                 ContactDatabase.class, "contacts-database2").allowMainThreadQueries().build();
+
         //Used for debugging purposes. Uncomment to start app with fresh database.
         //deleteAllContacts();
-        //deleteAllContacts();
-        //deleteAllContacts2();
-        fillListWithDatabase();
-        fillListWithDatabase2();
+        //deleteAllBlocked();
+
+        Log.i("Debug","Filling list from Database");
+        contacts.removeAll(contacts);
+        blockedcontacts.removeAll(blockedcontacts);
+        fillContactListWithDatabase();
+        fillBlockedListWithDatabase();
         Contact.setTotalContacts(contacts.size());
         updateContacts();
     }   //End onCreate()
@@ -230,17 +234,38 @@ public class MainActivity extends AppCompatActivity {
         loadContacts(importedContacts);
         Collections.sort(importedContacts);
 
-        for(int i = importedContacts.size() - 1; i >= 0; i--){
-            if(contacts.contains(importedContacts.get(i)))
-                importedContacts.remove(i);
-        }
-        if(importedContacts.size() == 0)
-            Toast.makeText(MainActivity.this, "Contacts are up to date", Toast.LENGTH_LONG).show();
+        boolean newImports = false;
+        newImports = checkImports(importedContacts, contacts); //checks for any new imports
+
+        if(newImports == false)
+            Toast.makeText(MainActivity.this, "contacts are up to date", Toast.LENGTH_LONG).show();
         else{
             Intent importContacts = new Intent(MainActivity.this, CreateContact.class);
             importContacts.putExtra("IMPORT_LIST", importedContacts);
             startActivityForResult(importContacts, 1);
         }
+    }
+
+    /**
+     *
+     * @param importedContacts
+     * @return boolean value which signifies if any new contacts exist
+     */
+    public boolean checkImports(ArrayList<Contact> importedContacts, ArrayList<Contact> contacts){
+        int i;
+
+        for(i = importedContacts.size() - 1; i >= 0; i--){
+            if(contacts.contains(importedContacts.get(i)))
+                importedContacts.remove(i);
+        }
+
+        if(importedContacts.size() == 0){
+            return false;
+        } else
+            return true;
+
+
+
     }
 
     public void viewContact(int contact){
@@ -278,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
      * Accesses the SQLite database and fills the contacts ArrayList with all users from
      * from the database.
      */
-    public void fillListWithDatabase(){
+    public void fillContactListWithDatabase(){
         ContactEntity[] contactEntityList = db.dao().loadAllContacts();
         for (int i = 0; i < contactEntityList.length; i++){
             contacts.add(entityToContact(contactEntityList[i]));
@@ -296,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void fillListWithDatabase2() {
+    public void fillBlockedListWithDatabase() {
         ContactEntity[] contactEntityList = db2.dao().loadAllContacts();
         for (int i = 0; i < contactEntityList.length; i++) {
             blockedcontacts.add(entityToContact(contactEntityList[i]));
@@ -310,7 +335,6 @@ public class MainActivity extends AppCompatActivity {
      * @return A Contact object that can be stored in the ArrayList.
      */
     public static Contact entityToContact(ContactEntity entity){
-        //Todo fix case where there is no group/image
         Contact contact = new Contact(entity.getName(),entity.getPhone(),entity.getEmail(),
                 entity.getAddress(),entity.getGroup(),entity.getImage(),entity.getId());
 
@@ -326,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
             db.dao().deleteContact(contactEntities[i]);
         }
     }
-    public void deleteAllContacts2(){
+    public void deleteAllBlocked(){
         ContactEntity[] contactEntities = db2.dao().loadAllContacts();
         for (int i = 0; i < contactEntities.length; i++){
             db2.dao().deleteContact(contactEntities[i]);

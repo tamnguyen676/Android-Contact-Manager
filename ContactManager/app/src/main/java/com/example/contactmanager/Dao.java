@@ -7,7 +7,7 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 /**
- * Created by Tam on 12/2/2017.
+ * Data access object used to perform CRUD operations on database.
  */
 @android.arch.persistence.room.Dao
 public interface Dao {

@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
 
@@ -56,7 +55,7 @@ public class ViewGroupActivity extends AppCompatActivity {
 
         TextView BarTitle = (TextView) findViewById(R.id.toolBarTitle);
         BarTitle.setText(group.getGroupName()+ " Members");
-        contacts = group.Contacts;
+        contacts = group.contacts;
         updateContacts();
      }
 
@@ -70,7 +69,6 @@ public class ViewGroupActivity extends AppCompatActivity {
 
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            //Todo Fix bug that causes sort do display "Name"  before "abc" due to uppercase letters
             updateContacts();
         }
         public void updateContacts()

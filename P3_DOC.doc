@@ -1,0 +1,16 @@
+
+
+III.) 
+All of the files required to run the program is included in the repository. Simply download or clone the repository onto your local machine and open with Android Studio. From there, open the MainActivity class. Run the MainActivity class. It can be run using the emulator or installed onto a physical Android phone.
+
+The user is then greeted to a list of all the conctacts, which should be empty the first time it is run. Below explains how to use features of the app.
+
+a.) Add Contact
+b.) Edit Contact
+c.) Delete Contact
+d.) Add Contact to Group
+c.) Block Contact
+d.) Unblock Contact
+e.) Import contacts
+
+a.) 

@@ -12,6 +12,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+/**
+ * Adapter for the Group RecyclerView
+ */
 public class GroupRecyclerAdapter extends RecyclerView.Adapter<GroupRecyclerAdapter.GroupViewHolder>{
     private int mNumItems;
     private ArrayList<Group> groupList;
@@ -78,6 +81,4 @@ public class GroupRecyclerAdapter extends RecyclerView.Adapter<GroupRecyclerAdap
         groupList = list;
         notifyDataSetChanged();
     }
-
-
 }

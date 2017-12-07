@@ -4,7 +4,8 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 /**
- * Created by Tam on 12/2/2017.
+ * An entity in the Room Persistence library, acts as the
+ * SQLite table. Stores all contact fields as separate columns.
  */
 
 @Entity
