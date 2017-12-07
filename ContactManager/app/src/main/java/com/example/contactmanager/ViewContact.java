@@ -90,6 +90,9 @@ public class ViewContact extends AppCompatActivity {
             this.finish();
     }
 
+    /**
+     * Adds click listeners to the dial, sms, email, and map buttons.
+     */
     private void setupButtons() {
         buttonText = (ImageButton) findViewById(R.id.btnText);
         buttonText.setOnClickListener(new View.OnClickListener(){
