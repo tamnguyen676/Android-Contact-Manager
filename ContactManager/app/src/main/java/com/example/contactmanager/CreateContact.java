@@ -226,7 +226,7 @@ public class CreateContact extends AppCompatActivity {
      * @param oldData intent data containing the old contact, if there is existing contact data to edit
      * @param newContact the new contact to be stored
      */
-    private void updateBlockedContact(Bundle oldData,Contact newContact){
+    public void updateBlockedContact(Bundle oldData,Contact newContact){
         if(oldData != null){ //If there is an old version of the contact, delete it first
             Contact oldContact = (Contact)oldData.getSerializable("CONTACT");
             MainActivity.contacts.remove(oldContact);
