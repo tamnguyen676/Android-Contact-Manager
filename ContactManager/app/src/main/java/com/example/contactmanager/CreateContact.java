@@ -72,6 +72,9 @@ public class CreateContact extends AppCompatActivity {
         btnBlockContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(imageUri == null)
+                    imageUri = Uri.parse("android.resource://com.example.contactmanager/drawable/no_photo");
+
                 Contact newContact = new Contact(nameTxt.getText().toString(),
                         phoneTxt.getText().toString(), emailTxt.getText().toString(),
                         addressTxt.getText().toString(), groupTxt.getText().toString(),
