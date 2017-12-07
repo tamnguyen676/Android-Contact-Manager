@@ -1,16 +1,55 @@
+I.) 
+We used the Factory design pattern to consolidate branch statements to handle permissions differences between Android API versions. The abstract class AndroidVersionFactory defines the methods that each version factory must implement and contains helper methods for shared code. There are two factory classes that implement this pattern, LollipopFactory and MarshmallowFactory. CreateContact utilizes the factories in its onCreate method.
 
+II.)
+Test classes are located in the directory:
+ContactManager\app\src\test\java\com\example\contactmanager 
 
-III.) 
-All of the files required to run the program is included in the repository. Simply download or clone the repository onto your local machine and open with Android Studio. From there, open the MainActivity class. Run the MainActivity class. It can be run using the emulator or installed onto a physical Android phone.
-
-The user is then greeted to a list of all the conctacts, which should be empty the first time it is run. Below explains how to use features of the app.
-
+III.)
+All of the files required to run the program are included in the repository. Simply download or clone the repository onto the local machine and then open it with Android Studio. Next, open the MainActivity class, then Run the MainActivity class. The android application can be run using the emulator or installed onto a physical Android phone.
+ 
+The user is initially greeted to a list of all the contacts which should be empty the first time it is run. When the user multiple users, scroll down to continue viewing. Below is an explanation on how to use the features of the contact manager app.
+ 
 a.) Add Contact
-b.) Edit Contact
-c.) Delete Contact
-d.) Add Contact to Group
-c.) Block Contact
-d.) Unblock Contact
-e.) Import contacts
+b.) View Contact
+c.) Edit Contact
+d.) Add Contact Image
+e.) Delete Contact
+f.) Add Contact to Group
+g.) Block Contact
+h.) Unblock Contact
+i.) Import Contacts
+j.) View Blocked Contacts
+k.) View Groups
+l.) View Contacts in Group
+m.) Save Contacts to Device
+ 
 
-a.) 
+
+a.) To add contacts, click the red plus button on the top right corner of the homepage. The button opens a contact creator screen where the user can edit/insert fields for a new contact. A contact name is the minimum requirement for a contact to be considered legal in the application, all other fields are optional and can be left blank. The available fields are Name, phone number, email, address, group and a profile picture. The desired fields can be saved by clicking the “Save Contact” button at the bottom of the screen.
+
+c.) To view a contact, click the desired contact from the homepage listview to open their profile page. This new page will display any available information pertaining to the selected contact, this includes the information entered in the contact creator page.
+ 
+c.) To edit a contact, select the contact you would like to edit from the application’s homepage to enter the contact’s profile page. From there, click on the pencil icon on the top right corner of the screen. A new page will appear that looks and behaves like the "Contact Creator" page in part a. Here the user can edit any fields of the contact, finally click the “Save Contact” button to save edits.
+ 
+d.) To add an image to a contact, either select to add a new contact or edit an existing contact via their profile page. Entering the “Contact Creator” or “Edit” page, click the current contact image (the silhouette if no custom image) on the upper part of the screen. The user will then be taken to a file manager where they can choose any image on their device. Click the image desired. When returned to the edit/create contact page, the newly selected image will be displayed in place of the previous profile picture, click save to finalize changes.
+ 
+e.) To delete a contact, select a contact from the application’s homepage to be taken to their profile page. From there, click the trash can icon on the upper right corner of the screen. This will open a prompt asking the user if they are sure if they want to delete the contact, if “Ok” is clicked then the contact is deleted, otherwise the deletion is canceled.
+
+f.) To add a contact to a group, either select to add a new contact or edit an existing contact via their profile page. Under the group field, type the name of the group you would like to add the contact to. The group name is case sensitive, afterwards Click save to finalize changes.
+
+
+g.) To block a contact, go to either the add contact or edit contact page. Click the “block contact” button to block that contact.
+
+h.) To unblock a contact, go to either the add contact or edit contact page. Click the “unblock contact” button to unblock that contact. 
+
+i.) To import contacts from the phone’s default contact list, click the up arrow icon on the top right corner of the Homepage. The user will then be prompted if they wish to import the contacts, if “Ok” is clicked then the contact are imported, otherwise the action is canceled. This will only import new contacts not present in the current contact list. If all imports are present, the user will be notified with a message displaying that contacts are up to date.
+
+j.) To view blocked contacts, click on the Blocked tab on the Homepage. Scroll up or down the list to see more if necessary.
+
+k.) To view groups, click on the Groups tab on the main page. Scroll up or down the list to see more if necessary.
+
+l.) To view members in a group, click on the Groups tab on the main page, then click on the group you would like to see the members of. A list will then be displayed showing all members of that group.
+
+m.) Contacts are saved automatically to the local device so that they are not deleted when the app resets. The user does not have to do any manual saving.
+
