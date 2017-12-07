@@ -78,7 +78,7 @@ public class ViewContact extends AppCompatActivity {
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    deleteContact();
+                                    deleteContact(contact);
                                 }
                             })
                             .setNegativeButton(android.R.string.no, null)
@@ -278,14 +278,14 @@ public class ViewContact extends AppCompatActivity {
 
     /**
      * Deletes the contact that is being displayed on the current
-     * page. Removes it from the list and the database and updates the coutner.
+     * page. Removes it from the list and the database and updates the counter.
      */
-    private void deleteContact(){
-        Toast.makeText(ViewContact.this, "Removed " + contact.getName() + " from contacts", Toast.LENGTH_SHORT).show();
-        MainActivity.contacts.remove(contact);
+    protected void deleteContact(Contact contactToDelete){
+        Toast.makeText(ViewContact.this, "Removed " + contactToDelete.getName() + " from contacts", Toast.LENGTH_SHORT).show();
+        MainActivity.contacts.remove(contactToDelete);
         Contact.setTotalContacts(Contact.getTotalContacts() - 1);
         ((ContactManagerApplication)getApplication()).mainActivity.updateContacts();
-        MainActivity.db.dao().deleteContact(CreateContact.contactToEntity(contact));
+        MainActivity.db.dao().deleteContact(CreateContact.contactToEntity(contactToDelete));
         this.finish();
     }
 }

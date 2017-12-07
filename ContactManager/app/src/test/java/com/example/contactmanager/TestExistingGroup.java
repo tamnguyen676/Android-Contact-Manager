@@ -18,7 +18,7 @@ public class TestExistingGroup {
 
     @Before
     public void setupTest(){
-        Contact testContact = new Contact("test", "", "", "", "");
+        Contact testContact = new Contact("test", "", "", "", "","");
         Group[] groups = { new Group ("one", testContact), new Group("two", testContact), new Group("three", testContact) };
         MainActivity.groups = new ArrayList<Group>(Arrays.asList(groups));
         activity = new CreateContact();

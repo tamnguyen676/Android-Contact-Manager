@@ -9,7 +9,7 @@ import android.arch.persistence.room.RoomDatabase;
  * Room Persistence library provided by Google.
  */
 
-@Database(entities = {ContactEntity.class}, version = 1)
+@Database(entities = {ContactEntity.class}, version = 1, exportSchema = false)
 public abstract class ContactDatabase extends RoomDatabase{
     /**
      * The Room Persistence finds the Data Access Object using

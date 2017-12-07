@@ -281,7 +281,7 @@ public class CreateContact extends AppCompatActivity {
      *
      * @param newContact the contact being added to the list
      */
-    private void addContactToArray(Contact newContact) {
+    protected void addContactToArray(Contact newContact) {
 
         MainActivity.contacts.add(newContact); //Create the contact
 
@@ -319,7 +319,7 @@ public class CreateContact extends AppCompatActivity {
      * Adds the contact to the contacts database
      * @param newContact The new contact to be added
      */
-    private void addContactToDatabase(Contact newContact){
+    protected void addContactToDatabase(Contact newContact){
         MainActivity.db.dao().insertContact(contactToEntity(newContact));
     }
 
