@@ -54,9 +54,10 @@ public class MainActivity extends AppCompatActivity {
         contactRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         groupRecyclerView = (RecyclerView) findViewById(R.id.recyclerView2);
         blockedRecyclerView = (RecyclerView) findViewById(R.id.recyclerView3);
-        setupAllTabs();
 
-        checkPermissions();
+        setupAllTabs(); //Sets up all the tabs to be displayed and clikable
+
+        checkPermissions(); //Looks and asks for storage and contact permissions
 
         final Button btnImport = (Button) findViewById(R.id.btnImport);
         final ArrayList<Contact> importedContacts = new ArrayList<Contact>();
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("Import Contacts")
+                        .setTitle("Import contacts")
                         .setMessage("Would you like to import existing contacts from the default contact app?")
                         .setIcon(android.R.drawable.ic_menu_save)
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -76,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
                         })
                         .setNegativeButton(android.R.string.no, null)
                         .show();
-
             }
         });
 
@@ -102,6 +102,9 @@ public class MainActivity extends AppCompatActivity {
         //deleteAllContacts();
         //deleteAllBlocked();
 
+        Log.i("Debug","Filling list from Database");
+        contacts.removeAll(contacts);
+        blockedcontacts.removeAll(blockedcontacts);
         fillContactListWithDatabase();
         fillBlockedListWithDatabase();
         Contact.setTotalContacts(contacts.size());
@@ -236,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
                 importedContacts.remove(i);
         }
         if(importedContacts.size() == 0)
-            Toast.makeText(MainActivity.this, "Contacts are up to date", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "contacts are up to date", Toast.LENGTH_LONG).show();
         else{
             Intent importContacts = new Intent(MainActivity.this, CreateContact.class);
             importContacts.putExtra("IMPORT_LIST", importedContacts);
