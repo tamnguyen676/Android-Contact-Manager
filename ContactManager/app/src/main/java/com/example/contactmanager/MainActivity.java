@@ -234,17 +234,38 @@ public class MainActivity extends AppCompatActivity {
         loadContacts(importedContacts);
         Collections.sort(importedContacts);
 
-        for(int i = importedContacts.size() - 1; i >= 0; i--){
-            if(contacts.contains(importedContacts.get(i)))
-                importedContacts.remove(i);
-        }
-        if(importedContacts.size() == 0)
+        boolean newImports = false;
+        newImports = checkImports(importedContacts, contacts); //checks for any new imports
+
+        if(newImports == false)
             Toast.makeText(MainActivity.this, "contacts are up to date", Toast.LENGTH_LONG).show();
         else{
             Intent importContacts = new Intent(MainActivity.this, CreateContact.class);
             importContacts.putExtra("IMPORT_LIST", importedContacts);
             startActivityForResult(importContacts, 1);
         }
+    }
+
+    /**
+     *
+     * @param importedContacts
+     * @return boolean value which signifies if any new contacts exist
+     */
+    public boolean checkImports(ArrayList<Contact> importedContacts, ArrayList<Contact> contacts){
+        int i;
+
+        for(i = importedContacts.size() - 1; i >= 0; i--){
+            if(contacts.contains(importedContacts.get(i)))
+                importedContacts.remove(i);
+        }
+
+        if(importedContacts.size() == 0){
+            return false;
+        } else
+            return true;
+
+
+
     }
 
     public void viewContact(int contact){
